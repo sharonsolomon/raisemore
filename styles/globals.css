@@ -93,6 +93,14 @@ pre {
     display: none !important;
 }
 
+.cl-rootBox * {
+    box-shadow: none !important;
+}
+
+.cl-rootBox .cl-signUp-start {
+    @apply shadow-lg mt-12 !important;
+}
+
 .cl-card {
     @apply ring-1 ring-black ring-opacity-10 shadow-lg;
 }
@@ -345,9 +353,6 @@ main > div {
 .desktop-sidebar {
     @apply bg-gray-50;
     @apply bg-white;
-}
-.cl-rootBox * {
-    box-shadow: none !important;
 }
 
 main {
