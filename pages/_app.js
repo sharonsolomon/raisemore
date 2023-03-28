@@ -49,7 +49,7 @@ function SupabaseWrapper({ children }) {
                         : "supabase-local-development",
             })
     );
-    const supabaseClient = supabaseAccessToken && createSupabaseClient(supabaseAccessToken);
+    const supabaseClient = createSupabaseClient(supabaseAccessToken);
 
     return (
         <SupabaseProvider value={supabaseClient}>
