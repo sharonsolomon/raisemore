@@ -40,7 +40,7 @@ function PersonTagList({ person, addTag, deleteTag, restoreTag }) {
             <div className="sm:col-span-1">
                 {person.tags?.map((tag) => (
                     <dd className="mt-1 text-sm text-gray-900" key={tag.id}>
-                        <div class="overflow-ellipsis">
+                        <div className="overflow-ellipsis">
                             <span className={tag.remove_date && "line-through"}>
                                 <Link
                                     className={!tag.remove_date && "link"}
@@ -396,7 +396,7 @@ export default function PersonProfile({ personID }) {
                     />
                 </div>
                 <div className="col-span-4">
-                    <div class="overflow-ellipsis">
+                    <div className="overflow-ellipsis">
                         <PledgeHistory pledges={person?.pledges} {...mutations} />
                         <DonationHistory donations={person?.donations} {...mutations} />
                         <FECHistoryList FECHistory={FECHistory} />
