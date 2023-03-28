@@ -72,8 +72,8 @@ const config = {
                     },
                     // { to: "/blog", label: "Blog", position: "left" },
                     {
-                        href: "https://github.com/raisemore/",
-                        label: "GitHub",
+                        href: "https://www.raisemore.app",
+                        label: "Raise More Application",
                         position: "right",
                     },
                 ],
