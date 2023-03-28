@@ -1,3 +1,4 @@
+import { useSupabase } from "lib/supabaseHooks";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
@@ -124,6 +125,7 @@ const Brand = () => {
 };
 
 const Layout = ({ children }) => {
+    const supabase = useSupabase();
     // const { data: session } = useSession();
     const { isSignedIn, isLoading, user } = useUser();
 
@@ -311,7 +313,7 @@ const Layout = ({ children }) => {
                         <div className="py-6">
                             <SignedIn>
                                 {hasOrg ? (
-                                    children
+                                    supabase && children
                                 ) : (
                                     <div className="block min-h-full flex-col justify-center sm:px-6 lg:px-8">
                                         <div className="sm:mx-auto w-75">

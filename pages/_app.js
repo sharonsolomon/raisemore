@@ -38,8 +38,8 @@ function App({ Component, pageProps }) {
 }
 
 function SupabaseWrapper({ children }) {
-    const { getToken } = useAuth();
-    const { data: supabaseAccessToken } = useSWR(
+    const { getToken, userId } = useAuth();
+    const { data: supabaseAccessToken, mutate } = useSWR(
         () => "clerk",
         async () =>
             await getToken({
@@ -50,10 +50,11 @@ function SupabaseWrapper({ children }) {
             })
     );
     const supabaseClient = supabaseAccessToken && createSupabaseClient(supabaseAccessToken);
+    if (userId && !supabaseClient) mutate();
 
     return (
         <SupabaseProvider value={supabaseClient}>
-            <Layout>{supabaseClient && children}</Layout>
+            <Layout>{children}</Layout>
             <ChatWidgetWrapper />
         </SupabaseProvider>
     );
