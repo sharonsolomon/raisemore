@@ -77,3 +77,5 @@ next.config.wizardcopy.js
 
 # Hmmm.
 .swc
+
+*.icloud
