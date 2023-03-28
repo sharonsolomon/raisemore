@@ -314,6 +314,16 @@ model call_session_participants {
   @@unique([call_session_id, number_dialed_in_from])
 }
 
+model actblue_webhooks {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  inserted_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime? @db.Timestamptz(6)
+  webhook_body       Json      @unique
+  organization_id    String    @db.Uuid
+  first_line_item_id String?
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 view dashboard_by_account {
   organization_id               String?

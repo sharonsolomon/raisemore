@@ -1,0 +1,109 @@
+{
+    "donor": {
+        "firstname": "Donor",
+        "lastname": "Jill",
+        "addr1": "253 Klein Turnpike",
+        "city": "Somerville",
+        "state": "MA",
+        "zip": "70409",
+        "country": "United States",
+        "isEligibleForExpressLane": true,
+        "employerData": {
+            "employer": "West, Stroman and Thompson",
+            "occupation": "Teacher",
+            "employerAddr1": "7109 Stoltenberg Run",
+            "employerCity": "Hermistonport",
+            "employerState": "NH",
+            "employerCountry": "United States"
+        },
+        "email": "vitaehic38@example.com",
+        "phone": "925.186.6285 x99996"
+    },
+    "contribution": {
+        "createdAt": "2019-01-18T20:44:25-05:00",
+        "orderNumber": "AB00000000",
+        "contributionForm": "name-of-contribution-form",
+        "refcode": "r1 (DEPRECATED - use refcodes instead)",
+        "refcode2": "r2 (DEPRECATED - use refcodes instead)",
+        "refcodes": {
+            "refcode": "r1",
+            "refcode2": "r2",
+            "refcodeCustom": "r3"
+        },
+        "creditCardExpiration": "10/2021",
+        "recurringPeriod": "weekly",
+        "recurringDuration": 1,
+        "weeklyRecurringSunset": null,
+        "abTestName": "name_of_ab_Test",
+        "isRecurring": "true (DEPRECATED - use recurringPeriod instead)",
+        "isPaypal": false,
+        "isMobile": true,
+        "abTestVariation": "control",
+        "isExpress": false,
+        "withExpressLane": false,
+        "expressSignup": false,
+        "uniqueIdentifier": "a4cc36e7-3b22-4741-9c73-852a4794484f (DEPRECATED - use lineitemId instead)",
+        "status": "approved",
+        "thanksUrl": "url_for_approved_contribution.com",
+        "retryUrl": "url_for_declined_contribution.com",
+        "textMessageOption": "unknown",
+        "giftDeclined": false,
+        "giftIdentifier": 1001,
+        "shippingName": "Donor Jill",
+        "shippingAddr1": "253 Klein Turnpike",
+        "shippingCity": "Somerville",
+        "shippingState": "MA",
+        "shippingZip": "70709",
+        "shippingCountry": "USA",
+        "smartBoostAmount": "2.5",
+        "customFields": [
+            {
+                "label": "Favorite color?",
+                "answer": "blue"
+            }
+        ],
+        "merchandise": [
+            {
+                "name": "T-Shirt",
+                "itemId": 123242,
+                "details": {
+                    "color": "Blue",
+                    "size": "Small"
+                }
+            },
+            {
+                "name": "T-Shirt",
+                "itemId": 123242,
+                "details": {
+                    "color": "Blue",
+                    "size": "Medium"
+                }
+            },
+            {
+                "name": "Sticker",
+                "itemId": 234231,
+                "details": null
+            }
+        ]
+    },
+    "lineitems": [
+        {
+            "sequence": 0,
+            "entityId": 99999,
+            "fecId": null,
+            "committeeName": "LoremIpsum for Congress",
+            "amount": "25.9",
+            "recurringAmount": "15.7",
+            "paidAt": "2017-10-03T13:48:26-04:00",
+            "paymentId": "0123456 (DEPRECATED - use lineitemId if you need a unique identifier for each event notification)",
+            "lineitemId": 99999999
+        }
+    ],
+    "form": {
+        "name": "xyz-form",
+        "kind": "page",
+        "managingEntityName": "Lorem Ipsum",
+        "managingEntityCommitteeName": null,
+        "ownerEmail": null
+    }
+}

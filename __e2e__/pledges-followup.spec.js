@@ -22,7 +22,32 @@ test.describe("Pledge followup flow", () => {
         await page.getByRole("button", { name: "Upload another file" }).click();
         await expect(page.getByText("Are you importing donations/donors,")).toBeVisible();
     });
-    test.skip("Import pledges", async ({ page }) => {});
+    test("Import pledges", async ({ page }) => {
+        await page.goto("/import");
+        await page.getByRole("radio", { name: "Pledges" }).click();
+        await page.getByRole("button", { name: "Next step" }).click();
+        const fileChooserPromise = page.waitForEvent("filechooser");
+        await page.getByText("Browse").click();
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles("__e2e__/mocks/upload-pledges-basic-test.csv");
+        await page.waitForSelector("h2");
+        await expect(page.getByText("File uploaded successfully")).toBeVisible();
+        await page.getByRole("button", { name: "Upload another file" }).click();
+        await expect(page.getByText("Are you importing donations/donors,")).toBeVisible();
+    });
+    test("Import prospects", async ({ page }) => {
+        await page.goto("/import");
+        await page.getByRole("radio", { name: "Prospects" }).click();
+        await page.getByRole("button", { name: "Next step" }).click();
+        const fileChooserPromise = page.waitForEvent("filechooser");
+        await page.getByText("Browse").click();
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles("__e2e__/mocks/upload-prospects-basic-test.csv");
+        await page.waitForSelector("h2");
+        await expect(page.getByText("File uploaded successfully")).toBeVisible();
+        await page.getByRole("button", { name: "Upload another file" }).click();
+        await expect(page.getByText("Are you importing donations/donors,")).toBeVisible();
+    });
     test("People page displays correctly", async ({ page }) => {
         await page.goto("/people");
         await expect(page.getByRole("button", { name: "View Person" }).first()).toBeVisible();
@@ -67,6 +92,7 @@ test.describe("Pledge followup flow", () => {
         */
     });
     test("Imported donations appear accurately in profiles", async ({ page }) => {
+        // TODO: this needs a more accurate donation section selector
         // Live db check
         let response = await db.from("people").select("*, donations (*)").limit(1).single();
         let id = response.data.id;
@@ -90,7 +116,8 @@ test.describe("Pledge followup flow", () => {
             }
         }
     });
-    test.skip("Imported pledges appear accurately in profiles", async ({ page }) => {
+    test("Imported pledges appear accurately in profiles", async ({ page }) => {
+        // TODO: this needs a more accurate pledge section selector
         // Live db check
         let { data: pledge } = await db.from("pledges").select("*, people (*)").limit(1).single();
         let id = pledge.people.id;
@@ -150,9 +177,8 @@ test.describe("Pledge followup flow", () => {
         await expect(page.getByText(`exampleTag${randomSeed}`)).toBeVisible();
         // TODO: remove the tag
 
-        // TODO: Make primary
+        // TODO: Make primary a phone or emails
     });
-
     test("Create a single-table list", async ({ page }) => {
         await page.goto("/people");
         await page.getByRole("button", { name: "Add Filter Step" }).click();
@@ -165,6 +191,7 @@ test.describe("Pledge followup flow", () => {
             .fill("Everyone in New York");
         await page.getByRole("menuitem", { name: "Save" }).click();
         await page.goto("/savedlists");
+        // TODO: follow advice to replace waitfornavigation with waitforurl
         const navigationPromise = page.waitForNavigation();
         await page.getByRole("button", { name: "Edit Query" }).click();
         await navigationPromise;
@@ -177,7 +204,7 @@ test.describe("Pledge followup flow", () => {
     test.skip("Create a multi-table list re: pledges, past donations, and FEC data", async ({
         page,
     }) => {});
-    test.skip("Start a call session on multi-table list", async ({ page }) => {
+    test.skip("Start a call session on single-table list", async ({ page }) => {
         // TODO
     });
     test.skip("Dialing-in begins the list view", async ({ page }) => {
@@ -188,6 +215,9 @@ test.describe("Pledge followup flow", () => {
         // and disposition - based - control of "next/skip" button
     });
     test.skip("New notes and pledges are persisted", async ({ page }) => {
+        // This works
+    });
+    test.skip("Call sessions sync page view as realtime multi-player", async ({ page }) => {
         // This works
     });
     test.skip("Pledges page displays all pledges correctly", async ({ page }) => {
@@ -219,14 +249,15 @@ test.describe("Pledge followup flow", () => {
     TODO:
 
     IMPORT
-    Multiple phone fields
-    "Ask" field 
-    Field matching -> (a->b?)
-    Tags
-    PLEDGES
+    Multiple phone fields -- pledges/prospects need to support this as well
+    Tags -- need
 
     SEARCH:
     By multiple tables
     FEC summary view
 
+    IMPORT/LATER:
+    "Ask" field -- later
+    Field matching -> (a->b?) -- later
+    PLEDGES-- done
 */
