@@ -1,3 +1,4 @@
+import useSWR from "swr";
 import { useState, useEffect } from "react";
 import "styles/globals.css";
 import Layout from "components/Layout";
@@ -10,22 +11,21 @@ const inter = Inter({ subsets: ["latin"] });
 import { Analytics } from "@vercel/analytics/react";
 
 function App({ Component, pageProps }) {
+    const optionsSWR = {
+        fetcher: (url, init) => fetch(url, init).then((res) => res.json()),
+        keepPreviousData: true,
+    };
+    const globalCSS = `
+        html, body, .MuiDataGrid-root, code {
+            font-family: ${inter.style.fontFamily} !important;
+        }
+    `;
     return (
         <>
-            <style jsx global>{`
-                html,
-                body,
-                .MuiDataGrid-root,
-                code {
-                    font-family: ${inter.style.fontFamily} !important;
-                }
-            `}</style>
-            <SWRConfig
-                value={{
-                    fetcher: (resource, init) => fetch(resource, init).then((res) => res.json()),
-                    keepPreviousData: true,
-                }}
-            >
+            <style jsx global>
+                {globalCSS}
+            </style>
+            <SWRConfig value={optionsSWR}>
                 <ClerkProvider {...pageProps}>
                     <SupabaseWrapper>
                         <Component {...pageProps} />
@@ -38,39 +38,48 @@ function App({ Component, pageProps }) {
 }
 
 function SupabaseWrapper({ children }) {
-    const { mutate } = useSWRConfig();
-    let [supabaseClient, setSupabaseClient] = useState();
-    const { getToken, userId, sessionId, orgId } = useAuth();
-    useEffect(() => {
-        let now = async () => {
-            // Get the clerk.dev JWT
-            const supabaseAccessToken = await getToken({
+    const { getToken } = useAuth();
+    const { data: supabaseAccessToken } = useSWR(
+        () => "clerk",
+        async () =>
+            await getToken({
                 template:
                     process.env.NEXT_PUBLIC_ENVIRONMENT != "development"
                         ? "supabase"
                         : "supabase-local-development",
-            });
-            // Create and set the client
-            setSupabaseClient(createSupabaseClient(supabaseAccessToken));
-
-            // Invalidate all previous SWR cached calls
-            mutate(
-                (key) => true, // which cache keys are updated
-                undefined, // update cache data to `undefined`
-                { revalidate: false } // do not revalidate
-            );
-        };
-        now();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userId, sessionId, orgId]);
+            })
+    );
+    const supabaseClient = supabaseAccessToken && createSupabaseClient(supabaseAccessToken);
 
     return (
         <SupabaseProvider value={supabaseClient}>
             {supabaseClient ? <Layout>{children}</Layout> : null}
             <ChatWidgetWrapper />
-            {/* <Analytics /> */}
         </SupabaseProvider>
     );
 }
+
+// useEffect(() => {
+//     let now = async () => {
+//         // Get the clerk.dev JWT
+//         const supabaseAccessToken = await getToken({
+//             template:
+//                 process.env.NEXT_PUBLIC_ENVIRONMENT != "development"
+//                     ? "supabase"
+//                     : "supabase-local-development",
+//         });
+//         // Create and set the client
+//         setSupabaseClient(createSupabaseClient(supabaseAccessToken));
+
+//         // Invalidate all previous SWR cached calls
+//         mutate(
+//             (key) => true, // which cache keys are updated
+//             undefined, // update cache data to `undefined`
+//             { revalidate: false } // do not revalidate
+//         );
+//     };
+//     if (userId) now();
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+// }, [userId, sessionId, orgId]);
 
 export default App;

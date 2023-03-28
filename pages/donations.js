@@ -10,7 +10,7 @@ export default function Dashboard() {
                 <PageTitle title="Donations" descriptor="All donations." />
             </div>
             <div className="mx-auto max-w-7xl px-2  ">
-                <QueryBuilderProvider table="donations_for_user_display" />
+                <QueryBuilderProvider table="donations" />
             </div>
         </div>
     );
