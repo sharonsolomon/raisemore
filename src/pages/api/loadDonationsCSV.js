@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 export const config = { runtime: "edge" };
 import { getAuth } from "@clerk/nextjs/server";
 const { v4: uuid } = require("uuid");
@@ -160,6 +161,33 @@ export default async function loadDonationsCSV(req, res) {
     // Loop through every row and drop every key that is not present in permitTheseColumns
     fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
 
+    // Major refactoring for code reuse
+    const resultingPromises = await processDonations({
+        fileParsedToJSON,
+        supabase,
+        supabaseServiceRole,
+        orgID,
+        batchID,
+    });
+
+    await supabase
+        .from("import_batches")
+        .upsert([{ id: batchID, finalized: new Date().toISOString() }]);
+    console.timeEnd("functionexectime");
+
+    // res.send(`File uploaded successfully, and ${fileParsedToJSON.length} records processed.`);
+    return new Response(
+        `File uploaded successfully, and ${fileParsedToJSON.length} records processed.`
+    );
+}
+
+export async function processDonations({
+    fileParsedToJSON,
+    supabase,
+    supabaseServiceRole,
+    orgID,
+    batchID,
+}) {
     // Grab the people collection as an array of rows
     console.time("people query");
     const { data: people } = await supabaseServiceRole
@@ -263,33 +291,64 @@ export default async function loadDonationsCSV(req, res) {
     // OK we are actually going to insert People first bc of foreign key
     console.time("upsert records into people");
 
-    let peopleToUpsert = [...new Set(peopleIndexesToUpsert)].map(
-        (recordIndex) => people[recordIndex]
-    );
+    let peopleToUpsert = [...new Set(peopleIndexesToUpsert)].map((recordIndex) => ({
+        ...people[recordIndex],
+        organization_id: orgID,
+        batch_id: batchID,
+    }));
     // Strip keys not present in newPersonFromDonationObject()
     peopleToUpsert = stripKeys(
         peopleToUpsert,
-        Object.keys({ ...newPersonFromDonationObject(), id: null })
+        Object.keys({
+            ...newPersonFromDonationObject(),
+            id: null,
+            organization_id: null,
+            batch_id: null,
+        })
     );
+
+    console.log({ peopleToUpsert });
 
     const peopleInsertResults = await supabase
         .from("people")
         .upsert(peopleToUpsert, { ignoreDuplicates: false })
         .select("id");
-    if (peopleInsertResults?.error) throw peopleInsertResults.error;
+    if (peopleInsertResults?.error) {
+        console.error(peopleInsertResults?.error);
+        return NextResponse.json(peopleInsertResults.error, { status: 400 });
+    }
 
     const phoneInsertResults = await supabase
         .from("phone_numbers")
-        .upsert(newPhones, { ignoreDuplicates: false })
+        .upsert(
+            newPhones.map((newRecordObject) => ({
+                ...newRecordObject,
+                organization_id: orgID,
+                batch_id: batchID,
+            })),
+            { ignoreDuplicates: false }
+        )
         .select("id");
-    if (phoneInsertResults?.error) throw phoneInsertResults.error;
+    if (phoneInsertResults?.error) {
+        console.error(phoneInsertResults?.error);
+        return NextResponse.json(phoneInsertResults.error, { status: 400 });
+    }
 
     const emailsInsertResults = await supabase
         .from("emails")
-        .upsert(newEmails, { ignoreDuplicates: false })
+        .upsert(
+            newEmails.map((newRecordObject) => ({
+                ...newRecordObject,
+                organization_id: orgID,
+                batch_id: batchID,
+            })),
+            { ignoreDuplicates: false }
+        )
         .select("id");
-    if (emailsInsertResults?.error) throw emailsInsertResults.error;
-
+    if (emailsInsertResults?.error) {
+        console.error(emailsInsertResults?.error);
+        return NextResponse.json(emailsInsertResults.error, { status: 400 });
+    }
     console.timeEnd("upsert records into people");
 
     console.time("upload donations to db");
@@ -300,19 +359,11 @@ export default async function loadDonationsCSV(req, res) {
             supabase.from("donations").insert(fileParsedToJSON.slice(i, i + chunkSize))
         );
     }
-    await Promise.allSettled(donationsInsertResults);
+
     // TODO: Need better error handling:
     console.timeEnd("upload donations to db");
 
-    await supabase
-        .from("import_batches")
-        .upsert([{ id: batchID, finalized: new Date().toISOString() }]);
-    console.timeEnd("functionexectime");
-
-    // res.send(`File uploaded successfully, and ${fileParsedToJSON.length} records processed.`);
-    return new Response(
-        `File uploaded successfully, and ${fileParsedToJSON.length} records processed.`
-    );
+    return await Promise.allSettled(donationsInsertResults);
 }
 
 // Standarized!
@@ -322,7 +373,13 @@ function newPersonFromDonationObject(donation) {
         last_name: donation?.donor_last_name?.trim(),
         first_name: donation?.donor_first_name?.trim(),
         email: donation?.donor_email?.trim(),
-        phone: donation?.donor_phone?.trim(),
+        phone: Number(
+            donation?.donor_phone
+                ?.trim()
+                .toString()
+                .replaceAll(/[^0-9]/g, "")
+                .substring(0, 10)
+        ),
         employer: donation?.donor_employer?.trim(),
         occupation: donation?.donor_occupation?.trim(),
 

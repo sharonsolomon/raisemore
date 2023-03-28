@@ -322,6 +322,7 @@ model actblue_webhooks {
   webhook_body       Json      @unique
   organization_id    String    @db.Uuid
   first_line_item_id String?
+  processed          Boolean   @default(false)
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.

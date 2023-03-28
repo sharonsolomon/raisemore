@@ -5,7 +5,7 @@ CREATE TABLE "actblue_webhooks" (
     "inserted_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6),
     "webhook_body" JSONB NOT NULL,
-    "organization_id" UUID NOT NULL,
+    "organization_id" TEXT NOT NULL,
 
     CONSTRAINT "actblue_webhooks_pkey" PRIMARY KEY ("id")
 );
