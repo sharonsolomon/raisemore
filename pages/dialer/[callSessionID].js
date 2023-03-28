@@ -111,6 +111,7 @@ export default function CallSessionPage() {
         }
 
         return memoized;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conferenceUpdates?.length, session?.id, me?.call_sid]);
 
     // Handler for dialing in

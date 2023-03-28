@@ -6,7 +6,7 @@ import { ChevronRightIcon, HomeIcon } from "@heroicons/react/20/solid";
 export default function Breadcrumbs({ pages = [] }) {
     return (
         <nav className="mb-4 inline-flex rounded text-sm Breadcrumbs" aria-label="Breadcrumb">
-            <ol role="list" className="flex items-center space-x-4">
+            <ol role="list" className="flex items-center space-x-1">
                 <li>
                     <div>
                         <Link href="/" className="text-gray-400 hover:text-gray-700">
@@ -27,7 +27,7 @@ export default function Breadcrumbs({ pages = [] }) {
                             />
                             <Link
                                 href={page.href}
-                                className="ml-4  text-gray-400 hover:text-gray-700"
+                                className="ml-1 text-gray-400 hover:text-gray-700"
                                 aria-current={page.current ? "page" : undefined}
                             >
                                 {page.name}
