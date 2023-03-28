@@ -14,8 +14,8 @@
 
 ## Technical details:
 
--   Built with Next.js and Postgres, deployed to Vercel and Supabase.
--   Automated testing with Jest, Playwright, and Checkly.
--   Client side & API monitoring with Sentry and Logflare.
+-   Built with Next.js and Postgres.
+-   Automated testing with Playwright and Checkly.
+-   Client side monitoring with Sentry.
 
 ![](public/screenshot.png?raw=true)
