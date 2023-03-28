@@ -6,4 +6,8 @@ export default withClerkMiddleware((req) => {
 });
 
 // Stop Middleware running on static files
-export const config = { matcher: "/((?!.*\\.).*)" };
+export const config = {
+    matcher: "/((?!.*\\.).*)",
+    runtime: "experimental-edge", // for Edge API Routes only
+    unstable_allowDynamic: [],
+};
