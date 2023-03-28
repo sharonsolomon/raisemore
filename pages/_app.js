@@ -7,9 +7,7 @@ import { createSupabaseClient, SupabaseProvider } from "lib/supabaseHooks";
 import { SWRConfig, useSWRConfig } from "swr";
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
-
-// // For some reason, vercel analytics breask jest
-// import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/react";
 
 function App({ Component, pageProps }) {
     return (
