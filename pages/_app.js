@@ -53,7 +53,7 @@ function SupabaseWrapper({ children }) {
 
     return (
         <SupabaseProvider value={supabaseClient}>
-            {supabaseClient ? <Layout>{children}</Layout> : null}
+            <Layout>{supabaseClient && children}</Layout>
             <ChatWidgetWrapper />
         </SupabaseProvider>
     );
