@@ -36,9 +36,9 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
     const [query, setQuery] = useState(initialQuery);
 
     const { data: list, mutate: fetchList } = useQuery(
-        listID && useSupabase().from("saved_lists").select().eq("id", listID).single()
+        listID && supabase.from("saved_lists").select().eq("id", listID).single()
     );
-    if (query == initialQuery && list?.query) parseSQL(list.query);
+    if (query == initialQuery && list?.query) setQuery(parseSQL(list.query));
 
     var formattedQuery = formatQuery(query, {
         format: "sql",
