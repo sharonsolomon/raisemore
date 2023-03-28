@@ -32,6 +32,7 @@ function App({ Component, pageProps }) {
                     </SupabaseWrapper>
                 </ClerkProvider>
             </SWRConfig>
+            <Analytics />
         </>
     );
 }
