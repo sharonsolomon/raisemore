@@ -146,5 +146,19 @@ export default async function handler(req) {
     // console.log({ resultingPromises });
 
     console.timeEnd("processWebhook");
+
+    // Update db record to show it was processed
+    const showWebhookProcessedResponse = await supabaseServiceRole
+        .from("actblue_webhooks")
+        .update({ processed: true })
+        .eq("id", id);
+    if (showWebhookProcessedResponse?.error) {
+        console.error(showWebhookProcessedResponse?.error);
+        return Response.json(showWebhookProcessedResponse?.error, {
+            status: 500,
+            statusText: "Server Error",
+        });
+    }
+
     return NextResponse.json({ resultingPromises }, { status: 200 });
 }
