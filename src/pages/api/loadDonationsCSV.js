@@ -168,9 +168,9 @@ async function loadFile({ fileName, supabaseServiceRole }) {
     return rawContent;
 }
 
-function donationsCSVtoArray({ rawContent, batchID, orgID }) {
+export function donationsCSVtoArray({ rawContent, batchID, orgID }) {
     console.time("parse file");
-    let { data: fileParsedToJSON } = Papa.parse(modifiedContent, {
+    let { data: fileParsedToJSON } = Papa.parse(rawContent, {
         header: true,
         skipEmptyLines: true,
         delimiter: ",",
@@ -319,7 +319,7 @@ export async function processDonations({
         })
     );
 
-    console.log({ peopleToUpsert });
+    // console.log({ peopleToUpsert });
 
     const peopleInsertResults = await supabase
         .from("people")
