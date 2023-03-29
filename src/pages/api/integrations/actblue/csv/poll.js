@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 export const config = { runtime: "edge" };
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { getAuth } from "@clerk/nextjs/server";
-import { BASE_URI } from "pages/api/integrations/actblue/requestCSV";
+import { BASE_URI } from "pages/api/integrations/actblue/request";
 
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));

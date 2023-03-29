@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 export const config = { runtime: "edge" };
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { processDonations, donationsCSVtoArray } from "pages/api/loadDonationsCSV";
-import { BASE_URI } from "pages/api/integrations/actblue/requestCSV";
+import { BASE_URI } from "pages/api/integrations/actblue/request";
 import { v4 as uuid } from "uuid";
 
 export default async function handler(req) {
