@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 export const config = { runtime: "edge" };
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { getAuth } from "@clerk/nextjs/server";
+export const BASE_URI = "https://secure.actblue.com/api/v1";
 
 export default async function handler(req) {
     // Clerk
@@ -20,8 +21,6 @@ export default async function handler(req) {
         .single();
 
     const { client_uuid, client_secret } = credential;
-
-    const BASE_URI = "https://secure.actblue.com/api/v1";
 
     const body = {
         csv_type: "paid_contributions",

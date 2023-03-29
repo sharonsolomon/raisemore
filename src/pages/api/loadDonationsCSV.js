@@ -130,36 +130,11 @@ export default async function loadDonationsCSV(req, res) {
     console.log("------");
     console.log("loadDonationsCSV()");
 
-    console.time("load file");
-    // Get the file from supabase storage
-    const { data: fileBlob, error } = await supabaseServiceRole.storage
-        .from("public/imports")
-        .download(fileName);
-    let rawContent = await fileBlob.text();
-    console.log("rawContent.length", rawContent.length);
-    console.timeEnd("load file");
+    // Load the file from the bucket
+    const rawContent = await loadFile({ fileName, supabaseServiceRole });
 
-    console.time("parse file");
-    // Fix the headers in the raw content
-    var renamedColumnsHeader = rawContent
-        .split("\n", 1)[0]
-        .trim()
-        .replaceAll(" ", "_")
-        .toLowerCase();
-    rawContent = renamedColumnsHeader + rawContent.slice(rawContent.indexOf("\n"));
-    let { data: fileParsedToJSON } = Papa.parse(rawContent, { header: true, skipEmptyLines: true });
-    console.timeEnd("parse file");
-
-    console.time("edit file");
-    // Add the batch ID
-    fileParsedToJSON = fileParsedToJSON.map((row) => ({
-        ...row,
-        batch_id: batchID,
-        organization_id: orgID,
-    }));
-
-    // Loop through every row and drop every key that is not present in permitTheseColumns
-    fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
+    // Parse the csv file to an array of well-formed donation objects
+    const fileParsedToJSON = donationsCSVtoArray({ rawContent, batchID, orgID });
 
     // Major refactoring for code reuse
     const resultingPromises = await processDonations({
@@ -181,6 +156,42 @@ export default async function loadDonationsCSV(req, res) {
     );
 }
 
+async function loadFile({ fileName, supabaseServiceRole }) {
+    console.time("load file");
+    // Get the file from supabase storage
+    const { data: fileBlob, error } = await supabaseServiceRole.storage
+        .from("public/imports")
+        .download(fileName);
+    let rawContent = await fileBlob.text();
+    console.log("rawContent.length", rawContent.length);
+    console.timeEnd("load file");
+    return rawContent;
+}
+
+function donationsCSVtoArray({ rawContent, batchID, orgID }) {
+    console.time("parse file");
+    let { data: fileParsedToJSON } = Papa.parse(modifiedContent, {
+        header: true,
+        skipEmptyLines: true,
+        delimiter: ",",
+        transformHeader: (header) => header.trim().replaceAll(" ", "_").toLowerCase(),
+    });
+
+    // Add the batch ID
+    fileParsedToJSON = fileParsedToJSON.map((row) => ({
+        ...row,
+        batch_id: batchID,
+        organization_id: orgID,
+    }));
+
+    // Loop through every row and drop every key that is not present in permitTheseColumns
+    fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
+
+    console.timeEnd("parse file");
+
+    return fileParsedToJSON;
+}
+
 export async function processDonations({
     fileParsedToJSON,
     supabase,
@@ -195,6 +206,7 @@ export async function processDonations({
         .select("*, emails (*), phone_numbers(*)")
         .eq("organization_id", orgID);
     console.timeEnd("people query");
+    console.time("edit file");
 
     // Hashmap by email and fullname
     const hashByEmail = new Map();
