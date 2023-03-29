@@ -15,7 +15,7 @@ export default async function handler(req) {
         webhook_body = await req.json();
     } catch (e) {
         console.error(e);
-        return NextResponse.json("400 Bad Request POST body JSON unparseable", {
+        return NextResponse.json("400 Bad Request POST body JSON unparsable", {
             status: 400,
             statusText: "Bad Request",
         });

@@ -47,7 +47,7 @@ model conference_updates {
   reason                     String?
   participant_label          String?
   reason_conference_ended    String?
-  organization_id            String?
+  organization_id            String?  @default(dbgenerated("requesting_org_id()"))
 }
 
 model donations {
@@ -320,9 +320,31 @@ model actblue_webhooks {
   inserted_at        DateTime  @default(now()) @db.Timestamptz(6)
   updated_at         DateTime? @db.Timestamptz(6)
   webhook_body       Json      @unique
-  organization_id    String    @db.Uuid
+  organization_id    String    @default(dbgenerated("requesting_org_id()"))
   first_line_item_id String?
   processed          Boolean   @default(false)
+}
+
+model actblue_csv_credentials {
+  id              BigInt    @id(map: "actblue_csv_access_secrets_pkey") @default(autoincrement())
+  created_at      DateTime? @default(now()) @db.Timestamptz(6)
+  client_uuid     String?   @db.Uuid
+  client_secret   String?
+  inserted_at     DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime? @db.Timestamptz(6)
+  organization_id String    @default(dbgenerated("requesting_org_id()"))
+}
+
+model actblue_csv_requests {
+  id                 BigInt    @id @default(autoincrement())
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  inserted_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime? @db.Timestamptz(6)
+  actblue_request_id String?   @db.Uuid
+  error              String?
+  download_url       String?
+  status             String?
+  organization_id    String    @default(dbgenerated("requesting_org_id()"))
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
