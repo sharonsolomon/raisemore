@@ -15,7 +15,7 @@ export default async function handler(req) {
         .from("actblue_csv_requests")
         .select()
         .eq("actblue_request_id", id)
-        .eq("organization_id", orgID")
+        .eq("organization_id", orgID)
         .single();
     if (error) {
         console.error(error);
@@ -30,7 +30,27 @@ export default async function handler(req) {
     }
 
     // Start polling
-    const loop = pollCSV(id);
+    const loop = setInterval(async () => {
+        const response = await fetch(`${BASE_URI}/csvs/${id}`);
+        const csv = await response.json();
+        if (csv.download_url) {
+            clearInterval(loop);
+            await supabaseServiceRole
+                .from("actblue_csv_requests")
+                .update({ download_url: csv.download_url })
+                .eq("actblue_request_id", id)
+                .eq("organization_id", orgID);
+
+            // Send a fetch request to the processActblueCSV function
+            fetch("/api/integrations/actblue/processActblueCSV", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id, orgID }),
+            });
+        }
+    }, 1000);
 
     // Wait 20 seconds and clear interval (edge function is limited to 30 seconds)
     setTimeout(() => {
@@ -48,17 +68,3 @@ export default async function handler(req) {
 
     return NextResponse.json({ status: "ok" });
 }
-
-const pollCSV = async (csvUUID) => {
-    const loop = setInterval(async () => {
-        const response = await fetch(`${BASE_URI}/csvs/${csvUUID}`);
-        const csv = await response.json();
-        if (csv.download_url) {
-            clearInterval(loop);
-            const response = await fetch(csv.download_url);
-            const csv = await response.text();
-            console.log(csv);
-        }
-    }, 1000);
-    return loop;
-};
