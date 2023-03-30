@@ -5,29 +5,38 @@ import InsetInput from "components/InsetInput";
 import { randomUUID } from "lib/randomUUID-polyfill";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery, useSupabase } from "lib/supabaseHooks";
+import { useState } from "react";
 
-const copy = () => {};
+const copy = (v) => {
+    navigator.clipboard.writeText(v);
+};
 
 const InsetInputWithCopy = (props) => (
     <div className="flex w-full">
-        <InsetInput {...props} className={"mt-8 max-w-2xl flex-grow"} />
-        <CopyButton value={props.placeholder} />
+        <InsetInput {...props} className={"mt-6 max-w-2xl flex-grow"} />
+        <CopyButton value={props?.placeholder ?? props?.value} />
     </div>
 );
 
-const CopyButton = ({ value }) => (
-    <div className="flex-initial ml-3">
-        <button
-            type="button"
-            className="btn-primary mt-8"
-            onClick={() => {
-                copy(value);
-            }}
-        >
-            Copy
-        </button>
-    </div>
-);
+const CopyButton = ({ value }) => {
+    const [isCopied, setIsCopied] = useState(false);
+    return (
+        <div className="flex-initial ml-3">
+            <button
+                type="button"
+                className="btn-primary mt-6 transition duration-150 ease-in-out"
+                {...(isCopied && { disabled: true })}
+                onClick={() => {
+                    copy(value);
+                    setIsCopied(true);
+                    setTimeout(() => setIsCopied(false), 1500);
+                }}
+            >
+                {isCopied ? "Copied" : "Copy"}
+            </button>
+        </div>
+    );
+};
 
 export default function Sync() {
     const { orgId: orgID } = useAuth();
@@ -46,14 +55,20 @@ export default function Sync() {
         // get form data and create a new actblue_csv_credentials row
         const form_client_uuid = event.target[0].value;
         const form_client_secret = event.target[1].value;
+
         console.log({ form_client_uuid, form_client_secret });
+
         supabase
             .from("actblue_csv_credentials")
             .insert({ client_uuid: form_client_uuid, client_secret: form_client_secret })
             .then((res) => console.log)
-            .then(() => mutate);
+            .then(() => {
+                mutate();
+            });
 
-        fetch("/api/integrations/actblue/csv/request", { method: "POST" });
+        fetch("/api/integrations/actblue/csv/request", { method: "POST" })
+            .then((res) => console.log)
+            .catch((res) => console.error);
     };
 
     return (
@@ -81,27 +96,21 @@ export default function Sync() {
                 />
             </div>
             <div className="mx-auto max-w-7xl px-2">
-                <p className="mt-6">
-                    Complete both steps to backfill data from your database and make sure it stays
-                    up to date into the future:
-                </p>
                 <form onSubmit={submit}>
-                    <h3 className="mt-8 text-2xl mb-3 font-medium">
-                        Create ActBlue API Credentials
-                    </h3>
-                    <p className="mx-6 px-6 text-gray-500 border-l-2 text-sm">
-                        What is an API? An API is an interface acts as a bridge between two software
-                        programs, allowing them to share information, similar to how a vending
-                        machine interface (buttons!) allow a user to choose a snack and receive it
-                        without directly grabbing it. We use the ActBlue API to bulk load your past
-                        donation and donor information securely to our servers.
+                    <h2 className="mt-8 mb-4">Create ActBlue API Credentials</h2>
+                    <p className="">
+                        We use the ActBlue API to load your past donation and donor information in
+                        bulk securely to our server.
                     </p>
-                    <p className="mt-3">
+                    <p className="mt-3 px-6 text-gray-500 border-l-2 border-gray-200 text-base">
                         Generate new API credentials at{" "}
                         <Link href="https://secure.actblue.com/my-dashboards" className="link">
                             ActBlue dashboard
                         </Link>{" "}
-                        {"-> dashboard -> admin (left menu) -> API Credentials"}, then enter below:
+                        {"-> dashboard -> admin (left menu) -> API Credentials"}.
+                    </p>
+                    <p className="mt-3 px-6 text-gray-500 border-l-2 border-gray-200 text-base">
+                        Then enter below:
                     </p>
 
                     <InsetInput
@@ -109,6 +118,7 @@ export default function Sync() {
                         placeholder={client_uuid ?? "abcdefghi-abcd-abcd-abcd-abcdefghijkl"}
                         className={"w-96"}
                         disabled={!!client_uuid}
+                        {...(client_uuid && { value: client_uuid })}
                     />
                     <InsetInput
                         label="Client Secret"
@@ -116,30 +126,29 @@ export default function Sync() {
                             client_secret ??
                             "aBc/AbCdEfghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx=="
                         }
-                        className={"mt-8 w-96"}
+                        className={"mt-6 w-96"}
                         disabled={!!client_uuid}
+                        {...(client_secret && { value: client_secret })}
                     />
-                    <button type="submit" className="btn-primary mt-8" disabled={!!client_uuid}>
-                        Save and bulk request data
+                    <button type="submit" className="btn-primary mt-4" disabled={!!client_uuid}>
+                        Save + bulk request data
                     </button>
 
-                    <h3 className="mt-10 text-2xl mb-3 font-medium">Webhook Setup</h3>
-                    <p className="mx-6 px-6 text-gray-500 border-l-2 text-sm">
-                        {`What is a webhook? Webhooks are automated messages sent from one app to
-                        another when something happens. This lets ActBlue notify us in realtime as
-                        each of your donations come in. This helps keep our system 100% up to date
-                        in the future, in effect it allows us to avoid any future bulk data loading.
-                        It "just works".`}
+                    <h2 className="mt-14 mb-4">Webhook Setup</h2>
+                    <p className="">
+                        ActBlue uses webhooks to notify us in realtime as each of your donations
+                        come in, keeping Raise More up to date. <br />
                     </p>
-
-                    <p className="mt-3">
+                    <p className="mt-3 px-6 text-gray-500 border-l-2 border-gray-200 text-base">
                         Navigate to{" "}
                         <Link href="https://secure.actblue.com/my-dashboards" className="link">
                             ActBlue Dashboard
                         </Link>{" "}
-                        {"-> dashboard -> tools (left menu) -> Webhooks -> Request a New Webhook"}
+                        {"-> dashboard -> tools (left menu) -> Webhooks -> Request a New Webhook. "}
                     </p>
-                    <p className="mt-3">Then, input the below information:</p>
+                    <p className="mt-3 px-6 text-gray-500 border-l-2 border-gray-200 text-base">
+                        Then, input the below information:
+                    </p>
                     <InsetInput
                         label="Type"
                         placeholder="ActBlue Default"
@@ -158,7 +167,10 @@ export default function Sync() {
                         placeholder="Do not enter a date, not necessary"
                         disabled
                     />
-                    <p className="mt-6">That{`'`}s it!</p>
+                    <p className="mt-6 mb-12">
+                        Once you have sent the information to ActBlue, we will then notify you upon
+                        the first successful webhook delivery.
+                    </p>
                 </form>
             </div>
         </>

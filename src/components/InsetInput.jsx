@@ -1,4 +1,4 @@
-const InsetInput = ({ label, placeholder, className, disabled }) => (
+const InsetInput = ({ label, placeholder, className, disabled, value }) => (
     <div className={"relative mt-6 " + className}>
         <label
             htmlFor={label}
@@ -18,6 +18,7 @@ const InsetInput = ({ label, placeholder, className, disabled }) => (
             }
             placeholder={placeholder}
             disabled={disabled}
+            {...(value && { value })}
         />
     </div>
 );
