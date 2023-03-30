@@ -107,11 +107,11 @@ export default function Sync() {
 
                     <h3 className="mt-10 text-2xl mb-3 font-medium">Webhook Setup</h3>
                     <p className="mx-6 px-6 text-gray-500 border-l-2 text-sm">
-                        What is a webhook? Webhooks are automated messages sent from one app to
+                        {`What is a webhook? Webhooks are automated messages sent from one app to
                         another when something happens. This lets ActBlue notify us in realtime as
                         each of your donations come in. This helps keep our system 100% up to date
                         in the future, in effect it allows us to avoid any future bulk data loading.
-                        It "just works".
+                        It "just works".`}
                     </p>
 
                     <p className="mt-3">
@@ -140,7 +140,7 @@ export default function Sync() {
                         placeholder="Do not enter a date, not necessary"
                         disabled
                     />
-                    <p className="mt-6">That's it!</p>
+                    <p className="mt-6">That{`'`}s it!</p>
                 </form>
             </div>
         </>

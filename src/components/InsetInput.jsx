@@ -1,4 +1,4 @@
-export default ({ label, placeholder, className, disabled }) => (
+const InsetInput = ({ label, placeholder, className, disabled }) => (
     <div className={"relative mt-6 " + className}>
         <label
             htmlFor={label}
@@ -21,3 +21,4 @@ export default ({ label, placeholder, className, disabled }) => (
         />
     </div>
 );
+export default InsetInput;
