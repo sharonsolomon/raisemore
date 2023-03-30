@@ -106,7 +106,7 @@ export default function Sync() {
                     </button>
 
                     <h3 className="mt-10 text-2xl mb-3 font-medium">Webhook Setup</h3>
-                    <p className="mx-6 px-6 text-gray-500 border-l-2">
+                    <p className="mx-6 px-6 text-gray-500 border-l-2 text-sm">
                         What is a webhook? Webhooks are automated messages sent from one app to
                         another when something happens. This lets ActBlue notify us in realtime as
                         each of your donations come in. This helps keep our system 100% up to date
