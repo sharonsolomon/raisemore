@@ -7,14 +7,10 @@ const db = createClient(
 );
 
 test.describe("ActBlue API import and webhooks", () => {
-    test.skip("Bulk import through UI", async ({
-        page,
-    }) => {
+    test.skip("Bulk import through UI", async ({ page }) => {
         // TODO: write test
     });
-    test.skip("Register a webhook and receive one successfully", async ({
-        page,
-    }) => {
+    test.skip("Register a webhook and receive one successfully", async ({ page }) => {
         // TODO: write test
     });
 });

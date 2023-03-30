@@ -403,19 +403,19 @@ export default function CallSessionPage() {
                     }}
                 >
                     {session?.current_person_id && (
-                        <Transition
-                            appear={true}
-                            show={true}
-                            enter="ease-in duration-500"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-out duration-60"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                            key={session.current_person_id}
-                        >
-                            <PersonProfile personID={session.current_person_id} />
-                        </Transition>
+                        // <Transition
+                        //     appear={true}
+                        //     show={true}
+                        //     enter="ease-in duration-500"
+                        //     enterFrom="opacity-0"
+                        //     enterTo="opacity-100"
+                        //     leave="ease-out duration-60"
+                        //     leaveFrom="opacity-100"
+                        //     leaveTo="opacity-0"
+                        //     key={session.current_person_id}
+                        // >
+                        <PersonProfile personID={session.current_person_id} />
+                        // </Transition>
                     )}
                 </CallSessionContext.Provider>
             </div>

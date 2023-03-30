@@ -333,10 +333,10 @@ nav .border-t {
 }
 .sticky .Search {
     /* @apply hidden; */
-    @apply -mr-7 -mt-0.5;
+    @apply -mr-12 -mt-0.5;
 }
 .Search .SearchBar input {
-    @apply rounded-full ring-0 ring-gray-200 hover:ring-indigo-600 border-0 xl:w-96 lg:w-60 w-20 px-8 mx-6 bg-gray-100 pl-14 mr-0 shadow text-sm xl:mr-12;
+    @apply rounded-full ring-0 ring-gray-200 hover:ring-indigo-600 border-0 xl:w-80 lg:w-60 w-20 px-8 mx-6 bg-gray-100 pl-14 mr-0 shadow text-sm xl:mr-6;
 }
 .sticky .Search:hover,
 .sticky .Search input:hover {

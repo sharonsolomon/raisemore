@@ -26,10 +26,7 @@ runtestandstop:
 	npm run test
 	pkill node || true
 
-newtest: stop start codegen stop
-	
-codegen:
-	npm run dev &
+newtest:
 	npx playwright codegen localhost:3000
 
 debugtests: stop start runtestdebugandstop

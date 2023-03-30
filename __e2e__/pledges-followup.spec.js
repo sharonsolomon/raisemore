@@ -210,6 +210,12 @@ test.describe("Pledge followup flow", () => {
     });
     test.skip("Start a call session on single-table list", async ({ page }) => {
         // TODO: write test
+        await page.goto("/savedlists");
+
+        await page
+            .locator("tr")
+            .filter({ hasText: "Everyone in New York" })
+            .filter({ has: page.getByRole("button", { name: "Start Call Session" }) });
     });
     test.skip("Dialing-in begins the list view", async ({ page }) => {
         // TODO: write test
