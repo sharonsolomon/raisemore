@@ -128,7 +128,7 @@ test.describe("Pledge followup flow", () => {
             page.getByRole("listitem").filter({ hasText: "$" + pledge.amount.toString() + " - " })
         ).toBeVisible();
     });
-    test("Add, remove, and 'make primary' different phone numbers and emails", async ({ page }) => {
+    test("Add and remove different phone numbers and emails", async ({ page }) => {
         // Importing phones and emails now has the right data structures and works
         // Primary is un-implemented
         // First, add, and remove, and make primary buttons
@@ -176,8 +176,9 @@ test.describe("Pledge followup flow", () => {
         await page.getByRole("button", { name: "Add Tag" }).click();
         await expect(page.getByText(`exampleTag${randomSeed}`)).toBeVisible();
         // TODO: remove the tag
-
-        // TODO: Make primary a phone or emails
+    });
+    test.skip("Make primary different phone numbers and emails", async ({ page }) => {
+        // TODO
     });
     test("Create a single-table list", async ({ page }) => {
         await page.goto("/people");
@@ -201,56 +202,65 @@ test.describe("Pledge followup flow", () => {
         });
         await expect(page.getByText("Everyone in New York")).toBeVisible();
     });
-    test.skip("Create a multi-table list re: pledges, past donations, and FEC data", async ({
-        page,
-    }) => {});
-    test.skip("Start a call session on single-table list", async ({ page }) => {
+    test.skip("Create a multi-table list re: pledges, past donations", async ({ page }) => {
         // TODO
     });
+    test.skip("Create a multi-table list with summary join-table of FEC data", async ({ page }) => {
+        // TODO
+    });
+    test.skip("Start a call session on single-table list", async ({ page }) => {
+        // TODO: write test
+    });
     test.skip("Dialing-in begins the list view", async ({ page }) => {
-        // This works!
+        // TODO: write test
     });
     test.skip("Call three people in a row, add notes and pledges", async ({ page }) => {
-        // This should work but needs dispositions
-        // and disposition - based - control of "next/skip" button
+        // TODO: write test
     });
     test.skip("New notes and pledges are persisted", async ({ page }) => {
-        // This works
+        // TODO: write test
     });
     test.skip("Call sessions sync page view as realtime multi-player", async ({ page }) => {
-        // This works
+        // TODO: write test
     });
     test.skip("Pledges page displays all pledges correctly", async ({ page }) => {
-        // Yes but needs linking and customization, etc
+        // TODO: write test
     });
     test.skip("Contact History page displays all past call attempts correctly", async ({
         page,
-    }) => {});
+    }) => {
+        // TODO: write test
+    });
 
     // ****************
     // Jacobs additions
     test.skip("Edit bio, occupation, employer", async ({ page }) => {
-        // Needs to be added
+        // TODO
     });
-    test.skip("Import with a tag column", async ({ page }) => {});
-    test.skip("Tag entire import", async ({ page }) => {});
-    test.skip("Start calling from a single person", async ({ page }) => {});
-
-    // ****************
-    // Security
-    test.skip("Supabase: unauthorized users cannot access anything", async ({ page }) => {});
-    test.skip("Supabase: users can only access their own organization", async ({ page }) => {});
-    test.skip("API: doesn't allow unauthorized access", async ({ page }) => {});
-    test.skip("API: Users can only access their own organization", async ({ page }) => {});
-    test.skip("API: Users can only upload to their own organization", async ({ page }) => {});
+    test.skip("Import multiple phone numbers", async ({ page }) => {
+        // TODO
+    });
+    test.skip("Calling cycles through each phone number in a contact before advancing", async ({
+        page,
+    }) => {
+        // TODO
+    });
+    test.skip("Import bio field", async ({ page }) => {
+        // TODO
+    });
+    test.skip("Import with a tag column", async ({ page }) => {
+        // TODO
+    });
+    test.skip("Tag entire import", async ({ page }) => {
+        // TODO
+    });
+    test.skip("Start calling from a single person", async ({ page }) => {
+        // TODO
+    });
 });
 
 /*
     TODO:
-
-    IMPORT
-    Multiple phone fields -- pledges/prospects need to support this as well
-    Tags -- need
 
     SEARCH:
     By multiple tables
