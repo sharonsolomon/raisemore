@@ -31,11 +31,30 @@ const CopyButton = ({ value }) => (
 
 export default function Sync() {
     const { orgId: orgID } = useAuth();
+    const supabase = useSupabase();
 
-    const { data, error } = useQuery(
-        useSupabase().from("actblue_credentials").select("*").maybeSingle()
+    const { data, error, mutate } = useQuery(
+        supabase.from("actblue_csv_credentials").select("*").limit(1).maybeSingle()
     );
-    const alreadyHaveCredentials = data?.length > 0;
+    console.log({ data });
+    const client_uuid = data?.client_uuid;
+    const client_secret = data?.client_secret;
+
+    const submit = (event) => {
+        event.preventDefault();
+        console.log("submit");
+        // get form data and create a new actblue_csv_credentials row
+        const form_client_uuid = event.target[0].value;
+        const form_client_secret = event.target[1].value;
+        console.log({ form_client_uuid, form_client_secret });
+        supabase
+            .from("actblue_csv_credentials")
+            .insert({ client_uuid: form_client_uuid, client_secret: form_client_secret })
+            .then((res) => console.log)
+            .then(() => mutate);
+
+        fetch("/api/integrations/actblue/csv/request", { method: "POST" });
+    };
 
     return (
         <>
@@ -66,7 +85,7 @@ export default function Sync() {
                     Complete both steps to backfill data from your database and make sure it stays
                     up to date into the future:
                 </p>
-                <form>
+                <form onSubmit={submit}>
                     <h3 className="mt-8 text-2xl mb-3 font-medium">
                         Create ActBlue API Credentials
                     </h3>
@@ -87,22 +106,21 @@ export default function Sync() {
 
                     <InsetInput
                         label="Client UUID"
-                        placeholder="abcdefghi-abcd-abcd-abcd-abcdefghijkl"
+                        placeholder={client_uuid ?? "abcdefghi-abcd-abcd-abcd-abcdefghijkl"}
                         className={"w-96"}
-                        disabled={alreadyHaveCredentials}
+                        disabled={!!client_uuid}
                     />
                     <InsetInput
                         label="Client Secret"
-                        placeholder="aBc/AbCdEfghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx=="
+                        placeholder={
+                            client_secret ??
+                            "aBc/AbCdEfghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwx=="
+                        }
                         className={"mt-8 w-96"}
-                        disabled={alreadyHaveCredentials}
+                        disabled={!!client_uuid}
                     />
-                    <button
-                        type="submit"
-                        className="btn-primary mt-8"
-                        disabled={alreadyHaveCredentials}
-                    >
-                        Save
+                    <button type="submit" className="btn-primary mt-8" disabled={!!client_uuid}>
+                        Save and bulk request data
                     </button>
 
                     <h3 className="mt-10 text-2xl mb-3 font-medium">Webhook Setup</h3>
