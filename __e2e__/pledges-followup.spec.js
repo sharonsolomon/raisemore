@@ -5,6 +5,9 @@ const db = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
+// Twilio client
+import initTwilio from "twilio";
+const twilio = initTwilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 test.describe("Pledge followup flow", () => {
     // ****************
@@ -208,20 +211,81 @@ test.describe("Pledge followup flow", () => {
     test.skip("Create a multi-table list with summary join-table of FEC data", async ({ page }) => {
         // TODO
     });
-    test.skip("Start a call session on single-table list", async ({ page }) => {
+    test("Start call session on single-table list, call 3 people, add notes and pledges", async ({
+        page,
+    }) => {
         // TODO: write test
         await page.goto("/savedlists");
 
+        const navigationPromise = page.waitForNavigation();
         await page
             .locator("tr")
             .filter({ hasText: "Everyone in New York" })
             .filter({ has: page.getByRole("button", { name: "Start Call Session" }) });
-    });
-    test.skip("Dialing-in begins the list view", async ({ page }) => {
-        // TODO: write test
-    });
-    test.skip("Call three people in a row, add notes and pledges", async ({ page }) => {
-        // TODO: write test
+        await navigationPromise;
+
+        // Dial in from twilio
+        const dialInFromNumber = 5856695750;
+        await page.getByLabel("Your phone number").fill(dialInFromNumber);
+        await page.getByRole("button", { name: "Make calls" }).click();
+        const numberToDial = await page
+            .locator(".dialer-top-card")
+            .innerText.replaceAll(/[^0-9]/g, "");
+        twilio.calls.create({
+            url: "http://demo.twilio.com/docs/voice.xml",
+            to: numberToDial,
+            from: dialInFromNumber,
+        });
+
+        // Wait for call to connect
+        await page.getByText("You're dialed in to the call session!");
+        expect(await page.getByText("You're dialed in to the call session!")).toBeVisible();
+
+        // Make a call
+        await page.getByRole("button", { name: "Call" }).click();
+
+        // Mark not home
+        await page.getByRole("button", { name: "Not home" }).click();
+        await page
+            .getByRole("textarea", { name: "Add your note..." })
+            .fill("Called but they didn't pick up, left a long voicemail");
+        await page.getByRole("button", { name: "Save interaction" }).click();
+        await page.getByText(
+            "Call: Not home, Called but they didn't pick up, left a long voicemail"
+        );
+
+        // move to next person
+        await page.getByRole("button", { name: "Next" }).click();
+
+        // Repeat
+        await page.getByRole("button", { name: "Pledged" }).click();
+        await page
+            .getByRole("textarea", { name: "Add your note..." })
+            .fill("Great conversation! Call them back soon to follow up");
+
+        await page.getByRole("button", { name: "Add pledge" }).click();
+        await page.getByRole("textbox", { name: "pledge" }).fill("123");
+        await page.getByRole("button", { name: "Save interaction" }).click();
+        await page.getByText("Call: Pledged, Great conversation! Call them back soon to follow up");
+        await page.getByText("Pledge: $123");
+        await page.getByText("$123 - ");
+
+        // move to next person
+        await page.getByRole("button", { name: "Next" }).click();
+
+        // Repeat one last time
+        await page.getByRole("button", { name: "Hostile" }).click();
+        await page
+            .getByRole("textarea", { name: "Add your note..." })
+            .fill("Blah blah blah example three");
+        await page.getByRole("button", { name: "Save interaction" }).click();
+        await page.getByText("Call: Hostile, Blah blah blah example three");
+
+        // That's it
+        const navigationPromise2 = page.waitForNavigation();
+        await page.getByRole("button", { name: "Leave session" }).click();
+        await navigationPromise2;
+        await expect(page.getByText("Join or start a calling session.")).toBeVisible();
     });
     test.skip("New notes and pledges are persisted", async ({ page }) => {
         // TODO: write test

@@ -94,6 +94,8 @@ let permitTheseColumns = [
     "weekly_recurring_amount",
     "smart_boost_amount",
     "smart_boost_shown",
+    "bio",
+    "tags",
 ];
 
 // Load csv of donations to donation and people table
@@ -221,14 +223,15 @@ export async function processDonations({
     // Keep track of who has been updated
     const peopleIndexesToUpsert = [],
         newEmails = [],
-        newPhones = [];
+        newPhones = [],
+        newTags = [];
 
     // Loop through donation objects
     for (let index = 0; index < fileParsedToJSON.length; index++) {
         const donation = fileParsedToJSON[index];
 
         // Create an object to hold new information, desctructre to remove the email and phone
-        const { email, phone, ...newPerson } = {
+        const { tags, email, phone, ...newPerson } = {
             ...newPersonFromDonationObject(donation),
             batch_id: batchID,
             organization_id: orgID,
@@ -262,13 +265,6 @@ export async function processDonations({
         // Phones
         const validated_phone_number = Number(phone?.toString().replaceAll("[^0-9]", ""));
         const phoneIsValid = validated_phone_number?.toString().length === 10;
-        // console.log(validated_phone_number);
-        // console.log(
-        //     !people[matchingIndex]?.phone_numbers
-        //         ?.map((phoneRecord) => phoneRecord.phone_number.toString().replaceAll("[^0-9]", ""))
-        //         .includes(validated_phone_number.toString())
-        // );
-
         if (
             phoneIsValid &&
             (matchingIndex == people.length ||
@@ -288,6 +284,19 @@ export async function processDonations({
             newPhones.push(newPhoneRecord);
         }
         // TODO: else {throw a validation error;}
+
+        // Tags!
+        tags?.split(",")
+            ?.map((tag) => tag.trim())
+            ?.filter((tag) => typeof tag === "string" && tag?.length > 0)
+            ?.forEach((tag) =>
+                newTags.push({
+                    tag,
+                    person_id: personID,
+                    organization_id: orgID,
+                    batch_id: batchID,
+                })
+            );
 
         // Adjust name and email hashes for future searches
         hashByFullname.set(newPerson.first_name + "|" + newPerson.last_name, matchingIndex);
@@ -361,6 +370,17 @@ export async function processDonations({
         console.error(emailsInsertResults?.error);
         return NextResponse.json(emailsInsertResults.error, { status: 400 });
     }
+
+    // Upsert tags
+    const { error: tagInsertError } = await supabase
+        .from("tags")
+        .upsert(newTags, { ignoreDuplicates: true })
+        .select("id");
+    if (tagInsertError) {
+        console.error(tagInsertError);
+        return NextResponse.json(tagInsertError, { status: 400 });
+    }
+
     console.timeEnd("upsert records into people");
 
     console.time("upload donations to db");
@@ -394,6 +414,8 @@ function newPersonFromDonationObject(donation) {
         ),
         employer: donation?.donor_employer?.trim(),
         occupation: donation?.donor_occupation?.trim(),
+        bio: donation?.bio?.trim(),
+        tags: donation?.tags?.trim(),
 
         // Address
         addr1: donation?.donor_addr1?.trim(),
@@ -406,6 +428,7 @@ function newPersonFromDonationObject(donation) {
 }
 
 function stripKeys(arr, permitTheseKeys) {
+    // TODO: or consider... This could be made faster by using more memory instead of a n^2 in-place search/delete
     arr.forEach((row, index) => {
         for (const key in row) {
             if (!permitTheseKeys.includes(key)) delete arr[index][key];
