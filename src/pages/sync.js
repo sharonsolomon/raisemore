@@ -113,6 +113,7 @@ export default function Sync() {
                         in the future, in effect it allows us to avoid any future bulk data loading.
                         It "just works".
                     </p>
+
                     <p className="mt-3">
                         Navigate to{" "}
                         <Link href="https://secure.actblue.com/my-dashboards" className="link">
