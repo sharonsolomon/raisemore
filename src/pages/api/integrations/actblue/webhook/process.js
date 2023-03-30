@@ -5,6 +5,7 @@ import { createSupabaseClient } from "lib/supabaseHooks";
 import { processDonations } from "pages/api/loadDonationsCSV";
 
 export default async function handler(req) {
+    console.log("process actblue webhook handler()");
     console.time("processWebhook");
 
     if (req.method !== "POST") {

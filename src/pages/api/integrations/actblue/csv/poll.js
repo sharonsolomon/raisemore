@@ -83,7 +83,7 @@ export default async function handler(req, res) {
         }
 
         // Send a fetch request to the processActblueCSV function
-        fetch(`${process.env.ENVIRONMENT_URL}/api/integrations/actblue/csv/process`, {
+        await fetch(`${process.env.ENVIRONMENT_URL}/api/integrations/actblue/csv/process`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -97,7 +97,7 @@ export default async function handler(req, res) {
     console.log("end for loop and make fetch");
 
     // Start a new edge function and end this one
-    fetch(`${process.env.ENVIRONMENT_URL}/api/integrations/actblue/csv/poll`, {
+    await fetch(`${process.env.ENVIRONMENT_URL}/api/integrations/actblue/csv/poll`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

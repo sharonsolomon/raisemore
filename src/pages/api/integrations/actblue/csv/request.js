@@ -83,7 +83,7 @@ export default async function handler(req) {
 
     console.log("start polling");
     // Start polling
-    fetch(`${process.env.ENVIRONMENT_URL}/api/integrations/actblue/csv/poll`, {
+    await fetch(`${process.env.ENVIRONMENT_URL}/api/integrations/actblue/csv/poll`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

@@ -54,7 +54,7 @@ model donations {
   id                               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   person_id                        String?   @db.Uuid
   batch_id                         String?   @db.Uuid
-  created_at                       DateTime? @default(now()) @db.Timestamptz(6) 
+  created_at                       DateTime? @default(now()) @db.Timestamptz(6)
   inserted_at                      DateTime? @default(now()) @db.Timestamptz(6)
   updated_at                       DateTime? @db.Timestamptz(6)
   receipt_id                       String?

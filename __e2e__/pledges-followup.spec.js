@@ -230,7 +230,8 @@ test.describe("Pledge followup flow", () => {
         await page.getByRole("button", { name: "Make calls" }).click();
         const numberToDial = await page
             .locator(".dialer-top-card")
-            .innerText.replaceAll(/[^0-9]/g, "");
+            .textContent()
+            .replaceAll(/[^0-9]/g, "");
         twilio.calls.create({
             url: "http://demo.twilio.com/docs/voice.xml",
             to: numberToDial,
@@ -287,19 +288,43 @@ test.describe("Pledge followup flow", () => {
         await navigationPromise2;
         await expect(page.getByText("Join or start a calling session.")).toBeVisible();
     });
-    test.skip("New notes and pledges are persisted", async ({ page }) => {
-        // TODO: write test
+    test("New notes and pledges are persisted", async ({ page }) => {
+        // Test new notes and pledges are persisted
+        // 1. go to interactions page
+        // 2. look for the 3 interactions we just created in the previous test
+        // 3. check that the notes and pledges are there
+        await page.goto("/interactions");
+        await expect(
+            page.getByText("Called but they didn't pick up, left a long voicemail")
+        ).toBeVisible();
+        await expect(
+            page.getByText("Great conversation! Call them back soon to follow up")
+        ).toBeVisible();
+        await expect(page.getByText("Blah blah blah example three")).toBeVisible();
     });
     test.skip("Call sessions sync page view as realtime multi-player", async ({ page }) => {
         // TODO: write test
     });
-    test.skip("Pledges page displays all pledges correctly", async ({ page }) => {
-        // TODO: write test
+    test("Pledges page displays all pledges correctly", async ({ page }) => {
+        await page.goto("/pledges");
+
+        const { data: pledges } = await db.from("pledges").select("*");
+        for (const pledge of pledges) {
+            await expect(page.getByText("$" + pledge.amount)).toBeVisible();
+        }
     });
     test.skip("Contact History page displays all past call attempts correctly", async ({
         page,
     }) => {
-        // TODO: write test
+        await page.goto("/interactions");
+
+        const { data: interactions } = await db
+            .from("interactions")
+            .select("*")
+            .eq("organization_id", orgID);
+        for (const interaction of interactions) {
+            await expect(page.getByText(interaction.note)).toBeVisible();
+        }
     });
 
     // ****************
@@ -316,10 +341,10 @@ test.describe("Pledge followup flow", () => {
         // TODO
     });
     test.skip("Import bio field", async ({ page }) => {
-        // TODO
+        // done, WRITE TEST
     });
     test.skip("Import with a tag column", async ({ page }) => {
-        // TODO
+        // done, WRITE TEST
     });
     test.skip("Tag entire import", async ({ page }) => {
         // TODO
@@ -328,16 +353,3 @@ test.describe("Pledge followup flow", () => {
         // TODO
     });
 });
-
-/*
-    TODO:
-
-    SEARCH:
-    By multiple tables
-    FEC summary view
-
-    IMPORT/LATER:
-    "Ask" field -- later
-    Field matching -> (a->b?) -- later
-    PLEDGES-- done
-*/

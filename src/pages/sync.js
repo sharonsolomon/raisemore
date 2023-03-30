@@ -41,6 +41,7 @@ const CopyButton = ({ value }) => {
 export default function Sync() {
     const { orgId: orgID } = useAuth();
     const supabase = useSupabase();
+    const [processed, setProcessed] = useState(false);
 
     const { data, error, mutate } = useQuery(
         supabase.from("actblue_csv_credentials").select("*").limit(1).maybeSingle()
@@ -50,25 +51,58 @@ export default function Sync() {
     const client_secret = data?.client_secret;
 
     const submit = (event) => {
+        console.log("submit()");
         event.preventDefault();
-        console.log("submit");
+        asyncSubmit(event);
+    };
+
+    const asyncSubmit = async (event) => {
+        console.log("asyncsubmit()");
         // get form data and create a new actblue_csv_credentials row
         const form_client_uuid = event.target[0].value;
         const form_client_secret = event.target[1].value;
 
         console.log({ form_client_uuid, form_client_secret });
 
-        supabase
+        // Save credentials to db
+        const supabaseResponse = await supabase
             .from("actblue_csv_credentials")
             .insert({ client_uuid: form_client_uuid, client_secret: form_client_secret })
-            .then((res) => console.log)
-            .then(() => {
-                mutate();
-            });
+            .select()
+            .maybeSingle();
+        console.log({ supabaseResponse });
+        const id = supabaseResponse.data.id;
+        console.log({ id });
 
-        fetch("/api/integrations/actblue/csv/request", { method: "POST" })
-            .then((res) => console.log)
-            .catch((res) => console.error);
+        // Update UI
+        mutate();
+
+        // Trigger csv request
+        const fetchResponse = await fetch("/api/integrations/actblue/csv/request", {
+            method: "POST",
+        });
+        console.log({ fetchResponse });
+
+        // Start a listner for the csv request being processed
+        const channel = supabase
+            .channel("actblue_csv_requests")
+            .on(
+                "postgres_changes",
+                {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "actblue_csv_requests",
+                    filter: `id=eq.${id}`,
+                },
+                ({ new: update }) => {
+                    console.log({ update });
+                    if (update?.status === "processed") {
+                        setProcessed(true);
+                        supabase.removeChannel(channel);
+                    }
+                }
+            )
+            .subscribe();
     };
 
     return (
@@ -112,7 +146,6 @@ export default function Sync() {
                     <p className="mt-3 px-6 text-gray-500 border-l-2 border-gray-200 text-base">
                         Then enter below:
                     </p>
-
                     <InsetInput
                         label="Client UUID"
                         placeholder={client_uuid ?? "abcdefghi-abcd-abcd-abcd-abcdefghijkl"}
@@ -131,9 +164,15 @@ export default function Sync() {
                         {...(client_secret && { value: client_secret })}
                     />
                     <button type="submit" className="btn-primary mt-4" disabled={!!client_uuid}>
-                        Save + bulk request data
+                        Save ActBlue API credentials
                     </button>
-
+                    <span className="ml-3 text-sm">
+                        (triggers non-duplicative bulk sync of past donations)
+                    </span>
+                    <div>
+                        {processed &&
+                            "The credentials were saved and the import is finished processing."}
+                    </div>
                     <h2 className="mt-14 mb-4">Webhook Setup</h2>
                     <p className="">
                         ActBlue uses webhooks to notify us in realtime as each of your donations
