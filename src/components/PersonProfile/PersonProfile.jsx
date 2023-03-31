@@ -32,7 +32,7 @@ const EditableSingleMutation = ({
             onSubmit={(event) => {
                 event.preventDefault();
                 if (temp == null) {
-                    setTemp(person[field] ?? "a");
+                    setTemp(person[field] ?? "");
                 } else {
                     const newObj = {};
                     newObj[field] = temp;
