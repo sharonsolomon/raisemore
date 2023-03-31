@@ -385,10 +385,40 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
 
     // ****************
     // Jacobs additions
-    test.skip("Edit bio, occupation, employer", async ({ page }) => {
+    test("Edit bio, occupation, employer", async ({ page }) => {
         // Just need to write the test
         let { data: person } = await db.from("people").select("*, donations (*)").limit(1).single();
         await page.goto("/people/" + person.id);
+
+        // Bio
+        const newValues = {
+            "edit bio": "A new example bio",
+            "edit occupation": "New occupation",
+            "edit employer": "New employer",
+        };
+        for (const [ariaName, value] of Object.entries(newValues)) {
+            const form = await page.getByRole("form", { name: ariaName });
+            form.getByRole("button").click();
+            form.getByRole("textbox").type(value);
+            form.getByRole("button", { name: "Save" }).click();
+        }
+        // Await the persistance
+        await page.waitForLoadState("networkidle");
+
+        // Check that the changes were made on the page
+        for (const [ariaName, value] of Object.entries(newValues)) {
+            await expect(page.getByText(value)).toBeVisible();
+        }
+
+        // Check the db that changes were persisted
+        const { data: person } = await db
+            .from("people")
+            .select("*, donations (*)")
+            .eq("id", person.id)
+            .single();
+        await expect(person.bio).toBe("A new example bio");
+        await expect(person.occupation).toBe("New occupation");
+        await expect(person.employer).toBe("New employer");
     });
     test.skip("Import multiple phone numbers", async ({ page }) => {
         // TODO
@@ -441,9 +471,6 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
 
         const { count } = await db.from("tags").select("*", { count: "exact", head: true });
         expect(count).toBeGreaterThan(0);
-    });
-    test.skip("Tag entire import", async ({ page }) => {
-        // TODO
     });
     test.skip("Start calling from a single person", async ({ page }) => {
         // TODO

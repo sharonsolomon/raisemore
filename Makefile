@@ -26,7 +26,7 @@ runtest:
 	npm run test
 
 newtest:
-	npx playwright codegen localhost:3000
+	npx playwright codegen --load-storage=__e2e__/.auth/user.json localhost:3000
 
 debugtests: stop start runtestdebugandstop
 
