@@ -2,20 +2,19 @@ import Link from "next/link";
 import { useSupabase, useQuery } from "lib/supabaseHooks";
 import { useState, useEffect, useCallback, useMemo, useContext } from "react";
 import { PhoneIcon } from "@heroicons/react/20/solid";
-import InteractionHistory from "./InteractionHistory";
-import Breadcrumbs from "components/Layout/Breadcrumbs";
-import PersonContactInfo from "./PersonContactInfo";
 import { Tooltip } from "@mui/material";
 import { useUser } from "@clerk/nextjs";
-import FECHistoryList from "./FECHistoryList";
-import PledgeHistory from "./PledgeHistory";
-import DonationHistory from "./DonationHistory";
 import { randomUUID } from "lib/randomUUID-polyfill";
 import { CallSessionContext } from "pages/dialer/[callSessionID]";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { capitalize, pluralize } from "lib/cases";
 
-const pluralize = (single, plural, number) => (number > 1 ? plural : single);
-const capitalize = (s) => (s?.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : "");
+import InteractionHistory from "./InteractionHistory";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
+import PersonContactInfo from "./PersonContactInfo";
+import FECHistoryList from "./FECHistoryList";
+import PledgeHistory from "./PledgeHistory";
+import DonationHistory from "./DonationHistory";
 
 const EditableSingleMutation = ({
     field,
@@ -32,8 +31,8 @@ const EditableSingleMutation = ({
             aria-label={`edit ${field}`}
             onSubmit={(event) => {
                 event.preventDefault();
-                if (temp === null) {
-                    setTemp(person.hasOwnProperty(field) ? person[field] : "");
+                if (temp == null) {
+                    setTemp(person[field] ?? "a");
                 } else {
                     const newObj = {};
                     newObj[field] = temp;
@@ -42,7 +41,7 @@ const EditableSingleMutation = ({
                 }
             }}
         >
-            {temp === null && person.hasOwnProperty(field) && (
+            {temp == null && (
                 <span className="align-top">
                     {showFieldLabel && capitalize(field) + ": "}
                     {person[field]}
@@ -67,9 +66,9 @@ const EditableSingleMutation = ({
                     (temp === null && person[field]?.length && " unstyled-button")
                 }
             >
-                {temp === null && person[field]?.length && (
+                {temp === null && person[field]?.length ? (
                     <PencilSquareIcon className="mx-1 h-4 w-4 inline-block text-gray-400 hover:cursor-pointer hover:text-blue-600" />
-                )}
+                ) : null}
                 {temp !== null ? "Save" : person[field]?.length ? "" : "Add a " + field}
             </button>
         </form>
