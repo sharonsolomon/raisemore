@@ -230,8 +230,8 @@ export async function processDonations({
     for (let index = 0; index < fileParsedToJSON.length; index++) {
         const donation = fileParsedToJSON[index];
 
-        // Create an object to hold new information, desctructre to remove the email and phone
-        const { tags, email, phone, ...newPerson } = {
+        // Create an object to hold new information, desctructre to remove the email and phones
+        const { tags, email, phones, ...newPerson } = {
             ...newPersonFromDonationObject(donation),
             batch_id: batchID,
             organization_id: orgID,
@@ -262,28 +262,31 @@ export async function processDonations({
             people[matchingIndex].emails = [...oldEmails, newEmailRecord];
             newEmails.push(newEmailRecord);
         }
-        // Phones
-        const validated_phone_number = Number(phone?.toString().replaceAll("[^0-9]", ""));
-        const phoneIsValid = validated_phone_number?.toString().length === 10;
-        if (
-            phoneIsValid &&
-            (matchingIndex == people.length ||
-                !people[matchingIndex]?.phone_numbers
-                    ?.map((phoneRecord) =>
-                        phoneRecord.phone_number.toString().replaceAll("[^0-9]", "")
-                    )
-                    .includes(validated_phone_number.toString()))
-        ) {
-            const newPhoneRecord = {
-                phone_number: validated_phone_number,
-                person_id: personID,
-                batch_id: batchID,
-            };
-            const oldPhones = people[matchingIndex]?.phone_numbers || [];
-            people[matchingIndex].phone_numbers = [...oldPhones, newPhoneRecord];
-            newPhones.push(newPhoneRecord);
+
+        // Handle multiple phones
+        for (const phone of phones) {
+            const validated_phone_number = Number(phone?.toString().replaceAll("[^0-9]", ""));
+            const phoneIsValid = validated_phone_number?.toString().length === 10;
+            if (
+                phoneIsValid &&
+                (matchingIndex == people.length ||
+                    !people[matchingIndex]?.phone_numbers
+                        ?.map((phoneRecord) =>
+                            phoneRecord.phone_number.toString().replaceAll("[^0-9]", "")
+                        )
+                        .includes(validated_phone_number.toString()))
+            ) {
+                const newPhoneRecord = {
+                    phone_number: validated_phone_number,
+                    person_id: personID,
+                    batch_id: batchID,
+                };
+                const oldPhones = people[matchingIndex]?.phone_numbers || [];
+                people[matchingIndex].phone_numbers = [...oldPhones, newPhoneRecord];
+                newPhones.push(newPhoneRecord);
+            }
+            // TODO: else {throw a validation error;}
         }
-        // TODO: else {throw a validation error;}
 
         // Tags!
         tags?.split(",")
@@ -399,19 +402,22 @@ export async function processDonations({
 }
 
 // Standarized!
+const cleanPhone = (phone) =>
+    Number(
+        phone
+            ?.trim()
+            .toString()
+            .replaceAll(/[^0-9]/g, "")
+            .substring(0, 10)
+    );
+
 function newPersonFromDonationObject(donation) {
     return {
         // Basic assignments
         last_name: donation?.donor_last_name?.trim(),
         first_name: donation?.donor_first_name?.trim(),
         email: donation?.donor_email?.trim(),
-        phone: Number(
-            donation?.donor_phone
-                ?.trim()
-                .toString()
-                .replaceAll(/[^0-9]/g, "")
-                .substring(0, 10)
-        ),
+        phones: [cleanPhone(donation?.donor_phone)],
         employer: donation?.donor_employer?.trim(),
         occupation: donation?.donor_occupation?.trim(),
         bio: donation?.bio?.trim(),

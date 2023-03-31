@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 export const config = { runtime: "edge" };
 import { createSupabaseClient } from "lib/supabaseHooks";
-import { processDonations, donationsCSVtoArray } from "pages/api/loadDonationsCSV";
+import { processDonations, donationsCSVtoArray } from "pages/api/import/donations";
 import { BASE_URI } from "pages/api/integrations/actblue/csv/request";
 import { v4 as uuid } from "uuid";
 

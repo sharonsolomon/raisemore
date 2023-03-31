@@ -101,7 +101,7 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
                     load("done");
 
                     let fileProcessRequest = fetch(
-                        "/api/" + apiRoute + "?fileName=" + encodeURIComponent(data.path)
+                        "/api/import/" + apiRoute + "?fileName=" + encodeURIComponent(data.path)
                     );
 
                     nextStep();
@@ -126,9 +126,9 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
             };
         },
     });
-    const loadDonationsCSV = server("loadDonationsCSV");
-    const loadProspectsCSV = server("loadPledgesCSV");
-    const loadPledgesCSV = server("loadPledgesCSV");
+    const loadDonationsCSV = server("donations");
+    const loadProspectsCSV = server("pledges");
+    const loadPledgesCSV = server("pledges");
     return (
         <>
             {importType == "donations" && (
