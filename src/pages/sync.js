@@ -6,6 +6,7 @@ import { randomUUID } from "lib/randomUUID-polyfill";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery, useSupabase } from "lib/supabaseHooks";
 import { useState } from "react";
+import { notifyError, notify } from "lib/toasts";
 
 const copy = (v) => {
     navigator.clipboard.writeText(v);
@@ -38,10 +39,9 @@ const CopyButton = ({ value }) => {
     );
 };
 
-export default function Sync() {
+export default function SyncPage() {
     const { orgId: orgID } = useAuth();
     const supabase = useSupabase();
-    const [processed, setProcessed] = useState(false);
 
     const { data, error, mutate } = useQuery(
         supabase.from("actblue_csv_credentials").select("*").limit(1).maybeSingle()
@@ -62,6 +62,19 @@ export default function Sync() {
         const form_client_uuid = event.target[0].value;
         const form_client_secret = event.target[1].value;
 
+        // Validate
+        // form_client_uuid must contain four "-" characters
+        if (form_client_uuid.split("-").length !== 5) {
+            notifyError("ActBlue Client UUID must contain four dashes");
+        }
+        // form_client_secret must be 56 characters long
+        if (form_client_secret.length !== 56) {
+            notifyError("ActBlue Client Secret must be 56 characters long");
+        }
+        if (form_client_uuid.split("-").length !== 5 || form_client_secret.length !== 56) {
+            return;
+        }
+
         console.log({ form_client_uuid, form_client_secret });
 
         // Save credentials to db
@@ -77,12 +90,6 @@ export default function Sync() {
         // Update UI
         mutate();
 
-        // Trigger csv request
-        const fetchResponse = await fetch("/api/integrations/actblue/csv/request", {
-            method: "POST",
-        });
-        console.log({ fetchResponse });
-
         // Start a listner for the csv request being processed
         const channel = supabase
             .channel("actblue_csv_requests")
@@ -97,12 +104,18 @@ export default function Sync() {
                 ({ new: update }) => {
                     console.log({ update });
                     if (update?.status === "processed") {
-                        setProcessed(true);
+                        notify("The credentials were saved and the import is finished processing.");
                         supabase.removeChannel(channel);
                     }
                 }
             )
             .subscribe();
+
+        // Trigger csv request
+        const fetchResponse = await fetch("/api/integrations/actblue/csv/request", {
+            method: "POST",
+        });
+        console.log({ fetchResponse });
     };
 
     return (
@@ -169,10 +182,6 @@ export default function Sync() {
                     <span className="ml-3 text-sm">
                         (triggers non-duplicative bulk sync of past donations)
                     </span>
-                    <div>
-                        {processed &&
-                            "The credentials were saved and the import is finished processing."}
-                    </div>
                     <h2 className="mt-14 mb-4">Webhook Setup</h2>
                     <p className="">
                         ActBlue uses webhooks to notify us in realtime as each of your donations

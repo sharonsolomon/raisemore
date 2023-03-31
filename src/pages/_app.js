@@ -9,6 +9,7 @@ import { SWRConfig, useSWRConfig } from "swr";
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 import { Analytics } from "@vercel/analytics/react";
+import { ToastContainer } from "react-toastify";
 
 function App({ Component, pageProps }) {
     const optionsSWR = {
@@ -33,6 +34,7 @@ function App({ Component, pageProps }) {
                 </ClerkProvider>
             </SWRConfig>
             <Analytics />
+            <ToastContainer />
         </>
     );
 }

@@ -1,3 +1,4 @@
+import fs from "fs";
 import { test, expect } from "@playwright/test";
 require("dotenv").config();
 import { createClient } from "@supabase/supabase-js";
@@ -6,7 +7,7 @@ const db = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-test.describe("ActBlue API import and webhooks", () => {
+test.describe("ActBlue API", () => {
     test("Bulk import through UI", async ({ page }) => {
         await page.goto("/sync");
         await page
@@ -29,9 +30,5 @@ test.describe("ActBlue API import and webhooks", () => {
             .select("*", { count: "exact", head: true })
             .eq("recipient", "Latino Families Forward");
         await expect(count).toBeGreaterThan(54);
-    });
-    test.skip("Register a webhook and receive one successfully", async ({ page }) => {
-        // TODO: write test
-        // How to test this with actblue?
     });
 });
