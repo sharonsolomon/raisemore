@@ -90,8 +90,8 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
         await expect(page.getByText("$500 to")).toHaveCount(14);
         /*
             TODO: The imported donations don't match official records exactly
-            Additionally, "Actblue" shows up as the committe recieving a lot of donations
-            and we should replace it with the committe ID noted in the memo line of AB donations
+            Additionally, "Actblue" shows up as the committee receiving a lot of donations
+            and we should replace it with the committee ID noted in the memo line of AB donations
         */
     });
     test("Imported donations appear accurately in profiles", async ({ page }) => {
@@ -387,7 +387,11 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
     // Jacobs additions
     test("Edit bio, occupation, employer", async ({ page }) => {
         // Just need to write the test
-        let { data: person } = await db.from("people").select("*, donations (*)").limit(1).single();
+        const { data: person } = await db
+            .from("people")
+            .select("*, donations (*)")
+            .limit(1)
+            .single();
         await page.goto("/people/" + person.id);
 
         // Bio
@@ -411,14 +415,14 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
         }
 
         // Check the db that changes were persisted
-        const { data: person } = await db
+        const { data: updatedPerson } = await db
             .from("people")
             .select("*, donations (*)")
             .eq("id", person.id)
             .single();
-        await expect(person.bio).toBe("A new example bio");
-        await expect(person.occupation).toBe("New occupation");
-        await expect(person.employer).toBe("New employer");
+        await expect(updatedPerson.bio).toBe("A new example bio");
+        await expect(updatedPerson.occupation).toBe("New occupation");
+        await expect(updatedPerson.employer).toBe("New employer");
     });
     test("Import multiple phone numbers", async ({ page }) => {
         // mock file will be in __e2e__/mocks/import-multiple-phone-numbers-prospects-test.csv
@@ -472,11 +476,11 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
         await page.getByRole("button", { name: "Upload another file" }).click();
         await expect(page.getByText("Are you importing donations/donors,")).toBeVisible();
 
-        const { count } = await db
+        const { count: secondCount } = await db
             .from("people")
             .select("*", { count: "exact", head: true })
             .not("bio", "is", null);
-        expect(count).toBeGreaterThan(0);
+        expect(secondCount).toBeGreaterThan(0);
     });
     test("Import with a tag column", async ({ page }) => {
         const { count } = await db.from("tags").select("*", { count: "exact", head: true });
@@ -494,8 +498,10 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
         await page.getByRole("button", { name: "Upload another file" }).click();
         await expect(page.getByText("Are you importing donations/donors,")).toBeVisible();
 
-        const { count } = await db.from("tags").select("*", { count: "exact", head: true });
-        expect(count).toBeGreaterThan(0);
+        const { count: secondCount } = await db
+            .from("tags")
+            .select("*", { count: "exact", head: true });
+        expect(secondCount).toBeGreaterThan(0);
     });
     test.skip("Start calling from a single person", async ({ page }) => {
         // TODO
