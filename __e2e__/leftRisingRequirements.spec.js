@@ -180,8 +180,56 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
         await expect(page.getByText(`exampleTag${randomSeed}`)).toBeVisible();
         // TODO: remove the tag
     });
-    test.skip("Make primary different phone numbers and emails", async ({ page }) => {
-        // TODO
+    test("Make primary different phone numbers and emails", async ({ page }) => {
+        // Working, needs test
+        // Go to a random person
+        await page.goto("/people");
+        await expect(page.getByRole("button", { name: "View Person" }).first()).toBeVisible();
+        await page.getByRole("button", { name: "View Person" }).first().click();
+        await page.waitForURL(/.*\/people\/[a-z0-9-]+/);
+
+        // add a few phone numbers
+        for (let newNumber of ["5551234567", "5551234568", "5551234569"]) {
+            await page.getByRole("button", { name: "Add Phone" }).click();
+            await page.locator('input[name="newPhoneNumber"]').fill(newNumber);
+            await page.getByRole("button", { name: "Add Phone" }).click();
+
+            // await network activity
+            await page.waitForLoadState("networkidle");
+        }
+
+        // make the first number primary
+        await page
+            .getByRole("definition")
+            .filter({ hasText: "(555) 123-4567x" })
+            .first()
+            .getByRole("button", { name: "Make Primary" })
+            .click();
+
+        // await network activity
+        await page.waitForLoadState("networkidle");
+
+        // make the second number primary
+        await page
+            .getByRole("definition")
+            .filter({ hasText: "(555) 123-4568x" })
+            .first()
+            .getByRole("button", { name: "Make Primary" })
+            .click();
+
+        // await network activity
+        await page.waitForLoadState("networkidle");
+
+        // check the db
+        let { data: person } = await db
+            .from("people")
+            .select("*")
+            .eq("id", page.url().split("/").pop())
+            .single();
+        expect(person.primary_phone).toBe("(555) 123-4568");
+
+        // check to see that the page ui is rendering the now-primary phone number in bold
+        await expect(page.getByText("(555) 123-4568").first()).toHaveClass("font-bold");
     });
     test("Create a single-table list", async ({ page }) => {
         await page.goto("/people");

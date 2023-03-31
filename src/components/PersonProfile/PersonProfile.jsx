@@ -282,8 +282,22 @@ export default function PersonProfile({ personID }) {
                     .from("phone_numbers")
                     .update({ remove_date: new Date().toISOString(), remove_user: userID })
                     .eq("id", id),
+            makePrimaryPhone: async (phoneID) => {
+                // Remove existing primaries
+                await supabase
+                    .from("phone_numbers")
+                    .update({ primary_for: null })
+                    .eq("primary_for", personID)
+                    .eq("person_id", personID);
+
+                // Make this the primary
+                await supabase
+                    .from("phone_numbers")
+                    .update({ primary_for: personID })
+                    .eq("id", phoneID);
+            },
             addTag: async (newTag) =>
-                supabase.from("tags").insert({ tag: newTag, person_id: personID }),
+                await supabase.from("tags").insert({ tag: newTag, person_id: personID }),
             restorePhone: async (id) =>
                 await supabase
                     .from("phone_numbers")
