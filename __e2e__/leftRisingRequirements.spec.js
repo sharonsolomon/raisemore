@@ -420,8 +420,33 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
         await expect(person.occupation).toBe("New occupation");
         await expect(person.employer).toBe("New employer");
     });
-    test.skip("Import multiple phone numbers", async ({ page }) => {
-        // TODO
+    test("Import multiple phone numbers", async ({ page }) => {
+        // mock file will be in __e2e__/mocks/import-multiple-phone-numbers-prospects-test.csv
+        // mock file will be in __e2e__/mocks/import-multiple-phone-numbers-donations-test.csv
+
+        const fileName = "__e2e__/mocks/import-multiple-phone-numbers-prospects-test.csv";
+
+        await page.goto("/import");
+        await page.getByRole("radio", { name: "Prospects" }).click();
+        await page.getByRole("button", { name: "Next step" }).click();
+        const fileChooserPromise = page.waitForEvent("filechooser");
+        await page.getByText("Browse").click();
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles(fileName);
+        await page.waitForSelector("h2");
+        await expect(page.getByText("File uploaded successfully")).toBeVisible();
+        await page.getByRole("button", { name: "Upload another file" }).click();
+        await expect(page.getByText("Are you importing donations/donors,")).toBeVisible();
+
+        const { people } = db.from("people").select("*, phone_numbers(count)");
+        let areThereMultiplePhones = false;
+        for (const person of people) {
+            if (person.phone_numbers.count > 1) {
+                areThereMultiplePhones = true;
+                break;
+            }
+        }
+        await expect(areThereMultiplePhones).toBe(true);
     });
     test.skip("Calling cycles through each phone number in a contact before advancing", async ({
         page,

@@ -8,6 +8,7 @@ const { v4: uuid } = require("uuid");
 const Papa = require("papaparse"); // Handles csvs
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { EMAIL_VALIDATION_REGEX } from "lib/validation";
+import { cleanPhone } from "./donations";
 
 // List of columns in order from csv file
 let permitTheseColumns = [
@@ -27,15 +28,19 @@ let permitTheseColumns = [
 ];
 
 // Standarized!
-function newPersonFromPledgeObject(data) {
-    // This is a placeholder function for manipulating
-    // column headers and adding metadata later
+function newPersonFromPledgeObject(data = {}) {
+    const fields = Object.keys(data);
+    console.log({ fields });
+    const phoneFields = Object.keys(data).filter(
+        (field) => field.startsWith("donor_phone") || field.startsWith("phone")
+    );
+    const phones = phoneFields?.map((phoneField) => cleanPhone(data[phoneField]));
     const normalized = {
         first_name: data?.first_name,
         last_name: data?.last_name,
         zip: data?.zip,
         email: data?.email,
-        phone: data?.phone,
+        phones,
         bio: data?.bio,
         tags: data?.tags,
     };
@@ -104,8 +109,9 @@ export default async function loadPledgesCSV(req, res) {
         organization_id: orgID,
     }));
 
+    // This is not necessary anymore because of later normalization before insert
     // Loop through every row and drop every key that is not present in permitTheseColumns
-    fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
+    // fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
 
     // Grab the people collection as an array of rows
     console.time("people query");
@@ -136,7 +142,7 @@ export default async function loadPledgesCSV(req, res) {
         const pledge = fileParsedToJSON[index];
 
         // Create an object to hold new information, desctructre to remove the email and phone
-        const { tags, bio, email, phone, ...newPerson } = {
+        const { tags, bio, email, phones, ...newPerson } = {
             ...newPersonFromPledgeObject(pledge),
             batch_id: batchID,
             organization_id: orgID,
@@ -167,28 +173,31 @@ export default async function loadPledgesCSV(req, res) {
             people[matchingIndex].emails = [...oldEmails, newEmailRecord];
             newEmails.push(newEmailRecord);
         }
-        // Phones
-        const validated_phone_number = Number(phone?.toString().replaceAll("[^0-9]", ""));
-        const phoneIsValid = validated_phone_number?.toString().length === 10;
-        if (
-            phoneIsValid &&
-            (matchingIndex == people.length ||
-                !people[matchingIndex]?.phone_numbers
-                    ?.map((phoneRecord) =>
-                        phoneRecord.phone_number.toString().replaceAll("[^0-9]", "")
-                    )
-                    .includes(validated_phone_number.toString()))
-        ) {
-            const newPhoneRecord = {
-                phone_number: validated_phone_number,
-                person_id: personID,
-                batch_id: batchID,
-            };
-            const oldPhones = people[matchingIndex]?.phone_numbers || [];
-            people[matchingIndex].phone_numbers = [...oldPhones, newPhoneRecord];
-            newPhones.push(newPhoneRecord);
+
+        // Handle multiple phones
+        for (const phone of phones) {
+            const validated_phone_number = Number(phone?.toString().replaceAll("[^0-9]", ""));
+            const phoneIsValid = validated_phone_number?.toString().length === 10;
+            if (
+                phoneIsValid &&
+                (matchingIndex == people.length ||
+                    !people[matchingIndex]?.phone_numbers
+                        ?.map((phoneRecord) =>
+                            phoneRecord.phone_number.toString().replaceAll("[^0-9]", "")
+                        )
+                        .includes(validated_phone_number.toString()))
+            ) {
+                const newPhoneRecord = {
+                    phone_number: validated_phone_number,
+                    person_id: personID,
+                    batch_id: batchID,
+                };
+                const oldPhones = people[matchingIndex]?.phone_numbers || [];
+                people[matchingIndex].phone_numbers = [...oldPhones, newPhoneRecord];
+                newPhones.push(newPhoneRecord);
+            }
+            // TODO: else {throw a validation error;}
         }
-        // TODO: else {throw a validation error;}
 
         // Tags!
         tags?.split(",")

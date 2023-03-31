@@ -186,8 +186,9 @@ export function donationsCSVtoArray({ rawContent, batchID, orgID }) {
         organization_id: orgID,
     }));
 
+    // This is not necessary anymore because of later normalization before insert
     // Loop through every row and drop every key that is not present in permitTheseColumns
-    fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
+    // fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
 
     console.timeEnd("parse file");
 
@@ -387,11 +388,12 @@ export async function processDonations({
     console.timeEnd("upsert records into people");
 
     console.time("upload donations to db");
+    const donationsToInsert = stripKeys(fileParsedToJSON, permitTheseColumns);
     const chunkSize = 100;
     const donationsInsertResults = [];
     for (let i = 0; i < fileParsedToJSON.length; i += chunkSize) {
         donationsInsertResults.push(
-            supabase.from("donations").insert(fileParsedToJSON.slice(i, i + chunkSize))
+            supabase.from("donations").insert(donationsToInsert.slice(i, i + chunkSize))
         );
     }
 
@@ -402,7 +404,7 @@ export async function processDonations({
 }
 
 // Standarized!
-const cleanPhone = (phone) =>
+export const cleanPhone = (phone) =>
     Number(
         phone
             ?.trim()
@@ -411,13 +413,18 @@ const cleanPhone = (phone) =>
             .substring(0, 10)
     );
 
-function newPersonFromDonationObject(donation) {
+function newPersonFromDonationObject(donation = {}) {
+    // Multiple phone fields
+    const phoneFields = Object.keys(donation).filter(
+        (field) => field.startsWith("donor_phone") || field.startsWith("phone")
+    );
+    const phones = phoneFields?.map((phoneField) => cleanPhone(donation[phoneField]));
     return {
         // Basic assignments
         last_name: donation?.donor_last_name?.trim(),
         first_name: donation?.donor_first_name?.trim(),
         email: donation?.donor_email?.trim(),
-        phones: [cleanPhone(donation?.donor_phone)],
+        phones,
         employer: donation?.donor_employer?.trim(),
         occupation: donation?.donor_occupation?.trim(),
         bio: donation?.bio?.trim(),
