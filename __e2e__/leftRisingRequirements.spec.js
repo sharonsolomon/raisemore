@@ -9,7 +9,7 @@ const db = createClient(
 import initTwilio from "twilio";
 const twilio = initTwilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-test.describe("Pledge followup flow", () => {
+test.describe("Basic flow for pledge followup (LeftRising requirements)", () => {
     // ****************
     // Basics
     test("Import donations", async ({ page }) => {
