@@ -363,8 +363,10 @@ main > div {
     @apply pt-4 !important;
 }
 .desktop-sidebar {
-    @apply bg-gray-50;
-    @apply bg-white;
+    @apply hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col bg-white;
+}
+.main-panel {
+    @apply flex flex-1 flex-col md:pl-64;
 }
 
 main {
@@ -397,4 +399,15 @@ main {
 
 button[type].unstyled-button {
     @apply bg-transparent border-0 p-0 m-0 text-blue-600 hover:underline underline underline-offset-4 text-base font-normal hover:ring-2 ml-1 mt-0.5 !important;
+}
+
+.desktop-sidebar {
+    @apply top-1;
+}
+#wrapper {
+    @apply mt-1 relative;
+}
+#test {
+    @apply absolute top-0 left-0 w-full h-1;
+    background: linear-gradient(40deg, rgba(0, 123, 255, 0.3) 0%, rgba(255, 7, 110, 0.3) 100%);
 }
