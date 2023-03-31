@@ -1,5 +1,5 @@
 import Link from "next/link";
-import PageTitle from "components/PageTitle";
+import PageTitle from "components/Layout/PageTitle";
 import Breadcrumbs from "components/Layout/Breadcrumbs";
 import CallingSessionsGrid from "components/CallingSessionsGrid";
 

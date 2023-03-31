@@ -4,7 +4,7 @@ import Link from "next/link";
 import SupabaseTable from "components/SupabaseTable";
 import { useState, useEffect } from "react";
 import Breadcrumbs from "components/Layout/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import PageTitle from "components/Layout/PageTitle";
 
 export default function Dashboard() {
     return (

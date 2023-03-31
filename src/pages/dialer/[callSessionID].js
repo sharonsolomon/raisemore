@@ -2,7 +2,7 @@ import { Transition } from "@headlessui/react";
 import useSWR from "swr";
 const fetcher = (url) => fetch(url).then((r) => r.json());
 import { useRouter } from "next/router";
-// import PageTitle from "components/PageTitle";
+// import PageTitle from "components/Layout/PageTitle";
 import { PhoneIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect, useCallback, useReducer, createContext, useMemo } from "react";
 import { useQuery, useSupabase } from "lib/supabaseHooks";

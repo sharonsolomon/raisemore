@@ -1,7 +1,7 @@
 import QueryBuilderProvider from "components/QueryBuilderProvider";
 import { useRouter } from "next/router";
 import Breadcrumbs from "components/Layout/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import PageTitle from "components/Layout/PageTitle";
 import { useSupabase, useQuery } from "lib/supabaseHooks";
 
 export default function SpecificListPage() {

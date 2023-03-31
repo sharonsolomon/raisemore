@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Breadcrumbs from "components/Layout/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import PageTitle from "components/Layout/PageTitle";
 
 export default function Export() {
     return (

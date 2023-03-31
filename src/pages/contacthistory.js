@@ -1,6 +1,6 @@
 import SupabaseTable from "components/SupabaseTable";
 import Breadcrumbs from "components/Layout/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import PageTitle from "components/Layout/PageTitle";
 
 export default function Dashboard() {
     return (
