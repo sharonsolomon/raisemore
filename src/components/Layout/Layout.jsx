@@ -39,7 +39,7 @@ import {
 // // Commented out for Jest testing
 // import "@docsearch/css";
 
-import Search from "components/Search";
+import Search from "components/Layout/Search";
 
 const navigation = [
     { name: "Dashboard", href: "/", icon: HomeIcon, current: true },

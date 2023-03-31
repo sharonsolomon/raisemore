@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback, useReducer, createContext, useMemo } 
 import { useQuery, useSupabase } from "lib/supabaseHooks";
 // import { parseSQL } from "react-querybuilder";
 import Breadcrumbs from "components/Layout/Breadcrumbs";
-import PersonProfile from "components/PersonProfile";
+import PersonProfile from "components/PersonProfile/PersonProfile";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 

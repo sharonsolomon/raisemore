@@ -3,7 +3,7 @@ import { useSupabase, useQuery } from "lib/supabaseHooks";
 import { useState, useEffect, useCallback, useMemo, useContext } from "react";
 import { PhoneIcon } from "@heroicons/react/20/solid";
 import InteractionHistory from "./InteractionHistory";
-import Breadcrumbs from "./Breadcrumbs";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
 import PersonContactInfo from "./PersonContactInfo";
 import { Tooltip } from "@mui/material";
 import { useUser } from "@clerk/nextjs";
