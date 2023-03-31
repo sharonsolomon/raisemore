@@ -28,6 +28,8 @@ const EditableSingleMutation = ({
     return (
         <form
             className="inline"
+            id={`editable-single-mutation-${field}`}
+            aria-label={`edit ${field}`}
             onSubmit={(event) => {
                 event.preventDefault();
                 if (temp === null) {

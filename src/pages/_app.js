@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import { useState, useEffect } from "react";
 import "styles/globals.css";
-import Layout from "components/Layout";
+import Layout from "components/Layout/Layout";
 import { ClerkProvider, useAuth } from "@clerk/nextjs";
 import ChatWidgetWrapper from "components/ChatWidgetWrapper";
 import { createSupabaseClient, SupabaseProvider } from "lib/supabaseHooks";

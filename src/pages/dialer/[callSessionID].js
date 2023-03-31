@@ -7,7 +7,7 @@ import { PhoneIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect, useCallback, useReducer, createContext, useMemo } from "react";
 import { useQuery, useSupabase } from "lib/supabaseHooks";
 // import { parseSQL } from "react-querybuilder";
-import Breadcrumbs from "components/Breadcrumbs";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
 import PersonProfile from "components/PersonProfile";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";

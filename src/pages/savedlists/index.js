@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SupabaseTable from "components/SupabaseTable";
 import { useState, useEffect } from "react";
-import Breadcrumbs from "components/Breadcrumbs";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
 import PageTitle from "components/PageTitle";
 
 export default function Dashboard() {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import PageTitle from "components/PageTitle";
-import Breadcrumbs from "components/Breadcrumbs";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
 import CallingSessionsGrid from "components/CallingSessionsGrid";
 
 export default function MakeCallsPage() {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSupabase, useQuery } from "lib/supabaseHooks";
-import Breadcrumbs from "components/Breadcrumbs";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
 import PageTitle from "components/PageTitle";
 import CallingSessionsGrid from "components/CallingSessionsGrid";
 import { clerkClient, getAuth, buildClerkProps } from "@clerk/nextjs/server";

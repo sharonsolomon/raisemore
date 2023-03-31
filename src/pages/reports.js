@@ -1,5 +1,5 @@
 import PageTitle from "components/PageTitle";
-import Breadcrumbs from "components/Breadcrumbs";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
 
 export default function Reports() {
     return (

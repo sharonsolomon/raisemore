@@ -7,7 +7,7 @@ import { useOrganization } from "@clerk/nextjs";
 import { FilePond } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import { useSupabase } from "lib/supabaseHooks";
-import Breadcrumbs from "components/Breadcrumbs";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
 import PageTitle from "components/PageTitle";
 
 export default function Import() {

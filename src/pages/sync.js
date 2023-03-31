@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Breadcrumbs from "components/Breadcrumbs";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
 import PageTitle from "components/PageTitle";
 import InsetInput from "components/InsetInput";
 import { randomUUID } from "lib/randomUUID-polyfill";
