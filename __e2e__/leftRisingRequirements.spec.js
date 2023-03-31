@@ -302,8 +302,66 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
         ).toBeVisible();
         await expect(page.getByText("Blah blah blah example three")).toBeVisible();
     });
-    test.skip("Call sessions sync page view as realtime multi-player", async ({ page }) => {
+    test("Call sessions sync page view as realtime multi-player", async ({ page }) => {
         // TODO: write test
+        // Create two pages
+        const pageOne = await context.newPage();
+        const pageTwo = await context.newPage();
+
+        // Get pages of a browser context
+        // const allPages = context.pages();
+
+        // Navigate both pages to the make calls page
+        await pageOne.goto("/dialer/1");
+        await pageTwo.goto("/dialer/1");
+
+        // make sure the second page context matches first page's dom
+        const firstPersonName = await pageOne.locator("h1").textContent();
+        await expect(pageTwo.locator("h1").textContent()).toBe(firstPersonName);
+
+        // dial in from twilio on page one
+        const dialInFromNumber = 5856695750;
+        await pageOne.getByLabel("Your phone number").fill(dialInFromNumber);
+        await pageOne.getByRole("button", { name: "Make calls" }).click();
+        const numberToDial = await pageOne
+            .locator(".dialer-top-card")
+            .textContent()
+            .replaceAll(/[^0-9]/g, "");
+        twilio.calls.create({
+            url: "http://demo.twilio.com/docs/voice.xml",
+            to: numberToDial,
+            from: dialInFromNumber,
+        });
+
+        // Wait for call to connect
+        await pageOne.getByText("You're dialed in to the call session!");
+        expect(await pageOne.getByText("You're dialed in to the call session!")).toBeVisible();
+
+        // Fill in page two's dial-in-from-number prompt
+        await pageTwo.getByLabel("Your phone number").fill(dialInFromNumber);
+        await pageTwo.getByRole("button", { name: "Make calls" }).click();
+
+        // check page two status
+        await pageTwo.getByText("You're dialed in to the call session!");
+        expect(await pageTwo.getByText("You're dialed in to the call session!")).toBeVisible();
+
+        let lastPersonName = firstPersonName,
+            currentPersonName = await pageOne.locator("h1").textContent();
+        for (let i = 0; i < 3; i++) {
+            // Check that the new name doesn't match the old name
+            await expect(lastPersonName).not.toBe(currentPersonName);
+
+            // Check that the first and second page header match
+            await expect(pageTwo.locator("h1").textContent()).toBe(currentPersonName);
+
+            // Advance one person by clicking the button with the text "Skip"
+            await pageOne.getByRole("button", { name: "Skip" }).click();
+
+            // Wait for the page to update (react), without using hard timeout
+
+            lastPersonName = currentPersonName;
+            currentPersonName = await pageOne.locator("h1").textContent();
+        }
     });
     test("Pledges page displays all pledges correctly", async ({ page }) => {
         await page.goto("/pledges");
@@ -313,9 +371,7 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
             await expect(page.getByText("$" + pledge.amount)).toBeVisible();
         }
     });
-    test.skip("Contact History page displays all past call attempts correctly", async ({
-        page,
-    }) => {
+    test("Contact History page displays all past call attempts correctly", async ({ page }) => {
         await page.goto("/interactions");
 
         const { data: interactions } = await db
@@ -330,7 +386,9 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
     // ****************
     // Jacobs additions
     test.skip("Edit bio, occupation, employer", async ({ page }) => {
-        // TODO
+        // Just need to write the test
+        let { data: person } = await db.from("people").select("*, donations (*)").limit(1).single();
+        await page.goto("/people/" + person.id);
     });
     test.skip("Import multiple phone numbers", async ({ page }) => {
         // TODO
@@ -340,11 +398,49 @@ test.describe("Basic flow for pledge followup (LeftRising requirements)", () => 
     }) => {
         // TODO
     });
-    test.skip("Import bio field", async ({ page }) => {
-        // done, WRITE TEST
+    test("Import bio field", async ({ page }) => {
+        const { count } = await db
+            .from("people")
+            .select("*", { count: "exact", head: true })
+            .not("bio", "is", null);
+        expect(count).toBe(0);
+
+        await page.goto("/import");
+        await page.getByRole("radio", { name: "Prospects" }).click();
+        await page.getByRole("button", { name: "Next step" }).click();
+        const fileChooserPromise = page.waitForEvent("filechooser");
+        await page.getByText("Browse").click();
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles("__e2e__/mocks/upload-bio-column-test-prospects.csv");
+        await page.waitForSelector("h2");
+        await expect(page.getByText("File uploaded successfully")).toBeVisible();
+        await page.getByRole("button", { name: "Upload another file" }).click();
+        await expect(page.getByText("Are you importing donations/donors,")).toBeVisible();
+
+        const { count } = await db
+            .from("people")
+            .select("*", { count: "exact", head: true })
+            .not("bio", "is", null);
+        expect(count).toBeGreaterThan(0);
     });
-    test.skip("Import with a tag column", async ({ page }) => {
-        // done, WRITE TEST
+    test("Import with a tag column", async ({ page }) => {
+        const { count } = await db.from("tags").select("*", { count: "exact", head: true });
+        expect(count).toBe(0);
+
+        await page.goto("/import");
+        await page.getByRole("radio", { name: "Prospects" }).click();
+        await page.getByRole("button", { name: "Next step" }).click();
+        const fileChooserPromise = page.waitForEvent("filechooser");
+        await page.getByText("Browse").click();
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles("__e2e__/mocks/upload-tag-column-test-prospects.csv");
+        await page.waitForSelector("h2");
+        await expect(page.getByText("File uploaded successfully")).toBeVisible();
+        await page.getByRole("button", { name: "Upload another file" }).click();
+        await expect(page.getByText("Are you importing donations/donors,")).toBeVisible();
+
+        const { count } = await db.from("tags").select("*", { count: "exact", head: true });
+        expect(count).toBeGreaterThan(0);
     });
     test.skip("Tag entire import", async ({ page }) => {
         // TODO

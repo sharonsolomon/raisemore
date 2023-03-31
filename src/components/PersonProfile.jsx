@@ -12,8 +12,84 @@ import PledgeHistory from "./PledgeHistory";
 import DonationHistory from "./DonationHistory";
 import { randomUUID } from "lib/randomUUID-polyfill";
 import { CallSessionContext } from "pages/dialer/[callSessionID]";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
 const pluralize = (single, plural, number) => (number > 1 ? plural : single);
+const capitalize = (s) => (s?.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : "");
+
+const EditableSingleMutation = ({
+    field,
+    person,
+    mutatePerson,
+    showFieldLabel = false,
+    showButtonInsteadOfIcon,
+}) => {
+    const [temp, setTemp] = useState(null);
+    return (
+        <form
+            className="inline"
+            onSubmit={(event) => {
+                event.preventDefault();
+                if (temp === null) {
+                    setTemp(person.hasOwnProperty(field) ? person[field] : "");
+                } else {
+                    const newObj = {};
+                    newObj[field] = temp;
+                    mutatePerson(newObj);
+                    setTemp(null);
+                }
+            }}
+        >
+            {temp === null && person.hasOwnProperty(field) && (
+                <span className="align-top">
+                    {showFieldLabel && capitalize(field) + ": "}
+                    {person[field]}
+                </span>
+            )}
+            {temp !== null && (
+                <textarea
+                    value={temp}
+                    onChange={(event) => {
+                        setTemp(event.target.value);
+                    }}
+                    autoFocus
+                    className="mx-3 inline w-80 rounded-md border-0 py-1.5 pl-3 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+            )}
+
+            <button
+                type="submit"
+                className={
+                    "align-top inline button-xs " +
+                    (temp && " btn-primary") +
+                    (temp === null && person[field]?.length && " unstyled-button")
+                }
+            >
+                {temp === null && person[field]?.length && (
+                    <PencilSquareIcon className="mx-1 h-4 w-4 inline-block text-gray-400 hover:cursor-pointer hover:text-blue-600" />
+                )}
+                {temp !== null ? "Save" : person[field]?.length ? "" : "Add a " + field}
+            </button>
+        </form>
+    );
+};
+
+const Bio = ({ person, ...mutations }) => (
+    <EditableSingleMutation
+        field="bio"
+        person={person}
+        showFieldLabel={true}
+        showButtonInsteadOfIcon={true}
+        {...mutations}
+    />
+);
+
+const Occupation = ({ person, ...mutations }) => (
+    <EditableSingleMutation field="occupation" person={person} {...mutations} />
+);
+const Employer = ({ person, ...mutations }) => (
+    <EditableSingleMutation field="employer" person={person} {...mutations} />
+);
 
 function DonationsSummary({ person }) {
     const number = person?.donations?.length || 0;
@@ -110,7 +186,7 @@ function PersonTagList({ person, addTag, deleteTag, restoreTag }) {
 export default function PersonProfile({ personID }) {
     const { id: userID } = useUser();
     const supabase = useSupabase();
-    const [bio, setBio] = useState(null);
+
     const {
         needsLogToAdvance,
         callSessionID,
@@ -312,14 +388,20 @@ export default function PersonProfile({ personID }) {
                 <div id="person-header" className="grid grid-cols-12 gap-2">
                     <div className="col-span-8">
                         <Tooltip title={"Person ID: " + personID} arrow>
-                            <h1 className="mb-0">
+                            <h1 className="mb-1">
                                 {person.first_name} {person.last_name}
                             </h1>
                         </Tooltip>
-                        <h2 className="text-sm font-normal text-gray-600">
-                            {person.occupation} | {person.employer} | {person.state}
+                        <h2 className="mb-3 text-sm text-gray-700 font-normal">
+                            <Occupation person={person} {...mutations} /> |{" "}
+                            <Employer person={person} {...mutations} /> | {person.city},{" "}
+                            {person.state}
                         </h2>
-                        <div className="text-sm text-gray-900 font-semibold">
+
+                        <div className="mt-3 text-sm text-gray-700 font-normal">
+                            <Bio person={person} {...mutations} />
+                        </div>
+                        <div className="mt-3 text-sm text-gray-700 font-normal">
                             <span className="inline-flex mr-1.5">
                                 <DonationsSummary person={person} />
                             </span>
@@ -327,45 +409,6 @@ export default function PersonProfile({ personID }) {
                             <span className="inline-flex mx-1.5">
                                 <PledgesSummary person={person} />
                             </span>
-                        </div>
-                        <div className="mt-1 text-sm">
-                            <form
-                                className="block"
-                                onSubmit={(event) => {
-                                    event.preventDefault();
-                                    if (bio == null) setBio(person?.bio || "");
-                                    else {
-                                        mutations.mutatePerson({ bio: bio.trim() });
-                                        setBio(null);
-                                    }
-                                }}
-                            >
-                                {bio == null && person?.bio && (
-                                    <span className="align-top mr-3">Bio: {person.bio}</span>
-                                )}
-                                {bio !== null && (
-                                    <textarea
-                                        value={bio}
-                                        onChange={(event) => {
-                                            setBio(event.target.value);
-                                        }}
-                                        autoFocus
-                                        className="mr-3 inline w-80 rounded-md border-0 py-1.5 pl-3 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    />
-                                )}
-                                <button
-                                    type="submit"
-                                    className={
-                                        "align-top inline button-xs " + (bio && " btn-primary")
-                                    }
-                                >
-                                    {bio !== null
-                                        ? "Save"
-                                        : person?.bio?.length
-                                        ? "Edit"
-                                        : "Add a bio"}
-                                </button>
-                            </form>
                         </div>
                     </div>
                     <div className="text-right col-span-4">
