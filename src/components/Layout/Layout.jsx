@@ -234,111 +234,108 @@ const Layout = ({ children }) => {
                             </div>
                         </div>
                     </Dialog>
-                </Transition.Root>
+                </Transition.Root>{" "}
+            </Menu>
+            {/* Static sidebar for desktop */}
+            <div className="desktop-sidebar hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
+                {/* Sidebar component, swap this element with another sidebar if you like */}
+                <div className="desktop-sidebar-div-1 pt-5 flex flex-grow flex-col overflow-y-auto border-r border-gray-200">
+                    <Brand />
 
-                {/* Static sidebar for desktop */}
-                <div className="desktop-sidebar hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
-                    {/* Sidebar component, swap this element with another sidebar if you like */}
-                    <div className="desktop-sidebar-div-1 pt-5 flex flex-grow flex-col overflow-y-auto border-r border-gray-200">
-                        <Brand />
-
-                        <div className="desktop-sidebar-div-2 pt-5 flex flex-grow flex-col ">
-                            <nav className="flex-1 space-y-1 px-2 pb-4">
-                                {navigation.map((item, index) => (
-                                    <div key={index}>
-                                        <Link
-                                            href={item.href}
-                                            className={
-                                                item.current ? "nav-item current" : "nav-item"
-                                            }
-                                        >
-                                            <item.icon aria-hidden="true" />
-                                            {item.name}
-                                        </Link>
-                                        {["Make Calls", "Donations", "Sync Settings"].includes(
-                                            item.name
-                                        ) ? (
-                                            <div className="py-2">
-                                                <div className="flex-grow border-t border-gray-200"></div>
-                                            </div>
-                                        ) : (
-                                            ""
-                                        )}
-                                    </div>
-                                ))}
-                            </nav>
-                        </div>
+                    <div className="desktop-sidebar-div-2 pt-5 flex flex-grow flex-col ">
+                        <nav className="flex-1 space-y-1 px-2 pb-4">
+                            {navigation.map((item, index) => (
+                                <div key={index}>
+                                    <Link
+                                        href={item.href}
+                                        className={item.current ? "nav-item current" : "nav-item"}
+                                    >
+                                        <item.icon aria-hidden="true" />
+                                        {item.name}
+                                    </Link>
+                                    {["Make Calls", "Donations", "Sync Settings"].includes(
+                                        item.name
+                                    ) ? (
+                                        <div className="py-2">
+                                            <div className="flex-grow border-t border-gray-200"></div>
+                                        </div>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
+                            ))}
+                        </nav>
                     </div>
                 </div>
-                <div className="flex flex-1 flex-col md:pl-64">
-                    <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white border-b">
-                        <button
-                            type="button"
-                            className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
-                            onClick={() => setSidebarOpen(true)}
-                        >
-                            <span className="sr-only">Open sidebar</span>
-                            <Bars3BottomLeftIcon className="h-6 w-6" aria-hidden="true" />
-                        </button>
-                        <div className="flex flex-1 justify-between pr-4">
-                            {isSignedIn ? (
-                                <>
-                                    <div className="flex flex-1">
-                                        <div className="mr-5 relative pt-3 w-full text-gray-400 focus-within:text-gray-600">
-                                            <Search />
-                                        </div>
-                                    </div>
-                                    <div className="ml-4 flex items-center md:ml-6 gap-5">
-                                        <button
-                                            type="button"
-                                            className="rounded-full bg-gray-100 p-1.5 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                        >
-                                            <span className="sr-only">View notifications</span>
-                                            <BellIcon className="h-6 w-6" aria-hidden="true" />
-                                        </button>
-                                        <OrganizationSwitcher
-                                            hidePersonal={true}
-                                            afterSwitchOrganizationUrl="/"
-                                        />
-                                        <UserButton />
-                                    </div>
-                                </>
-                            ) : (
-                                ""
-                            )}
-                        </div>
-                    </div>
-
-                    <main className="flex-1">
-                        <div className="py-6">
-                            <SignedIn>
-                                {hasOrg ? (
-                                    supabase && children
-                                ) : (
-                                    <div className="block min-h-full flex-col justify-center sm:px-6 lg:px-8">
-                                        <div className="sm:mx-auto w-75">
-                                            <CreateOrganization />
-                                        </div>
-                                    </div>
-                                )}
-                            </SignedIn>
-                            <SignedOut>
-                                <div className="flex min-h-full flex-col justify-center  sm:px-6 lg:px-8">
-                                    <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                                        <SignUp
-                                            appearance={{
-                                                variables: {
-                                                    colorPrimary: "#388bff",
-                                                },
-                                            }}
-                                        />
+            </div>
+            <div className="flex flex-1 flex-col md:pl-64">
+                <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white border-b">
+                    <button
+                        type="button"
+                        className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+                        onClick={() => setSidebarOpen(true)}
+                    >
+                        <span className="sr-only">Open sidebar</span>
+                        <Bars3BottomLeftIcon className="h-6 w-6" aria-hidden="true" />
+                    </button>
+                    <div className="flex flex-1 justify-between pr-4">
+                        {isSignedIn ? (
+                            <>
+                                <div className="flex flex-1">
+                                    <div className="mr-5 relative pt-3 w-full text-gray-400 focus-within:text-gray-600">
+                                        <Search />
                                     </div>
                                 </div>
-                            </SignedOut>
-                        </div>
-                    </main>
+                                <div className="ml-4 flex items-center md:ml-6 gap-5">
+                                    <button
+                                        type="button"
+                                        className="rounded-full bg-gray-100 p-1.5 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                    >
+                                        <span className="sr-only">View notifications</span>
+                                        <BellIcon className="h-6 w-6" aria-hidden="true" />
+                                    </button>
+                                    <OrganizationSwitcher
+                                        hidePersonal={true}
+                                        afterSwitchOrganizationUrl="/"
+                                    />
+                                    <UserButton />
+                                </div>
+                            </>
+                        ) : (
+                            ""
+                        )}
+                    </div>
                 </div>
-            </Menu>
+
+                <main className="flex-1">
+                    <div className="py-6">
+                        <SignedIn>
+                            {hasOrg ? (
+                                supabase && children
+                            ) : (
+                                <div className="block min-h-full flex-col justify-center sm:px-6 lg:px-8">
+                                    <div className="sm:mx-auto w-75">
+                                        <CreateOrganization />
+                                    </div>
+                                </div>
+                            )}
+                        </SignedIn>
+                        <SignedOut>
+                            <div className="flex min-h-full flex-col justify-center  sm:px-6 lg:px-8">
+                                <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                                    <SignUp
+                                        appearance={{
+                                            variables: {
+                                                colorPrimary: "#388bff",
+                                            },
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </SignedOut>
+                    </div>
+                </main>
+            </div>
         </>
     );
 };
