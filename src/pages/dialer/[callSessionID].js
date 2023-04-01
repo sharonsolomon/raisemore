@@ -299,7 +299,7 @@ export default function CallSessionPage() {
                             {
                                 name: `Calling list "${session?.saved_lists?.name}"`,
                                 href: `/dialer/${callSessionID}`,
-                                current: false,
+                                current: true,
                             },
                         ]}
                     />

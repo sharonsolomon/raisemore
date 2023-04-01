@@ -12,7 +12,7 @@ export default function MakeCallsPage() {
                         {
                             name: "Make Calls",
                             href: "/dialer",
-                            current: false,
+                            current: true,
                         },
                     ]}
                 />

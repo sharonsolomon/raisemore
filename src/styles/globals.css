@@ -120,7 +120,7 @@ pre {
 }
 
 .nav-item svg {
-    @apply mr-4 flex-shrink-0 h-6 w-6 text-gray-300 group-hover:text-gray-500;
+    @apply mr-3 flex-shrink-0 h-6 w-6 text-gray-300 group-hover:text-gray-500;
 }
 
 .nav-item.current,
@@ -401,6 +401,7 @@ button[type].unstyled-button {
     @apply bg-transparent border-0 p-0 m-0 text-blue-600 hover:underline underline underline-offset-4 text-base font-normal hover:ring-2 ml-1 mt-0.5 !important;
 }
 
+/* More multicolor! shadows and heading horizontal rule */
 .desktop-sidebar {
     @apply top-1;
 }
@@ -408,6 +409,38 @@ button[type].unstyled-button {
     @apply mt-1 relative;
 }
 #test {
-    @apply absolute top-0 left-0 w-full h-1;
-    background: linear-gradient(40deg, rgba(0, 123, 255, 0.3) 0%, rgba(255, 7, 110, 0.3) 100%);
+    @apply absolute top-0 left-0 w-full h-0.5 !important;
+
+    background: linear-gradient(
+        40deg,
+        rgba(0, 123, 255, 0.3) 0%,
+        rgba(255, 7, 110, 0.3) 100%
+    ) !important;
+}
+
+.page-title-descriptor {
+    @apply mb-6;
+}
+
+main button:not(.unstyled-button) {
+    @apply shadow-lg !important;
+}
+main button.button-xs:not(.unstyled-button),
+main button.button-sm:not(.unstyled-button) {
+    @apply shadow-sm !important;
+}
+
+.SearchBar input:hover,
+.sticky button:hover {
+    @apply shadow-md !important;
+}
+.Breadcrumbs a {
+    @apply text-gray-400 hover:text-gray-700;
+    font-size: 0.8rem;
+}
+.Breadcrumbs .current {
+    @apply text-blue-600 bg-gray-100 rounded-full p-1 px-3 !important;
+}
+.Breadcrumbs a svg {
+    @apply text-gray-700 !important;
 }

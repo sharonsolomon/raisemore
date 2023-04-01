@@ -290,7 +290,7 @@ function Steps({ step: currentStepNum }) {
     );
 }
 
-const mailingLists = [
+const importChoices = [
     {
         id: 1,
         title: "Donations",
@@ -312,7 +312,7 @@ const mailingLists = [
 ];
 
 function Choices({ importType, setImportType }) {
-    console.log(importType);
+    console.log({ importType });
     return (
         <RadioGroup
             value={importType}
@@ -326,45 +326,39 @@ function Choices({ importType, setImportType }) {
             </RadioGroup.Label>
 
             <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
-                {mailingLists.map((mailingList) => (
+                {importChoices.map((importChoice) => (
                     <RadioGroup.Option
-                        key={mailingList.id}
-                        value={mailingList}
+                        key={importChoice.id}
+                        value={importChoice}
                         className={({ checked, active }) =>
                             classNames(
                                 checked ? "border-transparent" : "border-gray-300",
                                 active ? "border-indigo-500 ring-2 ring-indigo-500" : "",
-                                "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none"
+                                "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow hover:shadow-lg focus:outline-none"
                             )
                         }
                     >
-                        {({ checked, active }) => (
+                        {({ active }) => (
                             <>
                                 <span className="flex flex-1">
-                                    <span className="flex flex-col">
+                                    <span className="flex flex-col pt-1 pb-4">
                                         <RadioGroup.Label
                                             as="span"
                                             className="block text-sm font-medium text-gray-900"
                                         >
-                                            {mailingList.title}
+                                            {importChoice.title}
                                         </RadioGroup.Label>
                                         <RadioGroup.Description
                                             as="span"
                                             className="mt-1 flex items-center text-sm text-gray-500"
                                         >
-                                            {mailingList.description}
-                                        </RadioGroup.Description>
-                                        <RadioGroup.Description
-                                            as="span"
-                                            className="mt-8 text-sm font-medium text-gray-900"
-                                        >
-                                            {/* {mailingList.users} */}
+                                            {importChoice.description}
                                         </RadioGroup.Description>
                                     </span>
                                 </span>
                                 <CheckCircleIcon
                                     className={classNames(
-                                        !checked ? "invisible" : "",
+                                        !active ? "invisible" : "",
                                         "h-5 w-5 text-indigo-600"
                                     )}
                                     aria-hidden="true"
@@ -372,7 +366,7 @@ function Choices({ importType, setImportType }) {
                                 <span
                                     className={classNames(
                                         active ? "border" : "border-2",
-                                        checked ? "border-indigo-500" : "border-transparent",
+                                        active ? "border-indigo-500" : "border-transparent",
                                         "pointer-events-none absolute -inset-px rounded-lg"
                                     )}
                                     aria-hidden="true"

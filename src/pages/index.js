@@ -75,7 +75,7 @@ export default function Home(props) {
     return (
         <div className="">
             <div className="mx-auto max-w-7xl px-2">
-                <Breadcrumbs pages={[{ name: "Dashboard", href: "/", current: false }]} />
+                <Breadcrumbs pages={[{ name: "Dashboard", href: "/", current: true }]} />
                 <PageTitle
                     title="👋&nbsp; Dashboard"
                     descriptor="Welcome to your fundraising home base!"
