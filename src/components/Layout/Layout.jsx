@@ -103,7 +103,7 @@ function classNames(...classes) {
 
 const Brand = () => {
     return (
-        <>
+        <Link href="/">
             <div className="flex flex-shrink-0 items-center px-4 brand">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +120,7 @@ const Brand = () => {
 
                 <span>Raise More</span>
             </div>
-        </>
+        </Link>
     );
 };
 

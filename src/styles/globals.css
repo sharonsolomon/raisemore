@@ -124,9 +124,7 @@ pre {
 }
 
 .nav-item.current,
-.nav-item.current *,
-.nav-item:hover,
-.nav-item:hover * {
+.nav-item:hover {
     background: rgb(236, 244, 255) !important;
 }
 
@@ -403,17 +401,16 @@ button[type].unstyled-button {
 
 /* More multicolor! shadows and heading horizontal rule */
 .desktop-sidebar {
-    @apply top-1;
+    @apply top-0.5;
 }
 #wrapper {
-    @apply mt-1 relative;
+    @apply mt-0.5 relative;
 }
 #test {
     @apply absolute top-0 left-0 w-full h-0.5 !important;
-
     background: linear-gradient(
         40deg,
-        rgba(0, 123, 255, 0.3) 0%,
+        rgba(0, 123, 255, 0.3) 30%,
         rgba(255, 7, 110, 0.3) 100%
     ) !important;
 }
@@ -426,7 +423,8 @@ main button:not(.unstyled-button) {
     @apply shadow-lg !important;
 }
 main button.button-xs:not(.unstyled-button),
-main button.button-sm:not(.unstyled-button) {
+main button.button-sm:not(.unstyled-button),
+main .MuiBox-root button {
     @apply shadow-sm !important;
 }
 
@@ -443,4 +441,17 @@ main button.button-sm:not(.unstyled-button) {
 }
 .Breadcrumbs a svg {
     @apply text-gray-700 !important;
+}
+
+/* .gradient-purple-pink {
+    border: solid 1.5px transparent !important;
+    background-image: linear-gradient(white, white),
+        radial-gradient(circle at top left, rgba(0, 123, 255, 0.4) 0%, rgba(255, 57, 110, 0.4) 100%) !important;
+    background-origin: border-box !important;
+    background-clip: padding-box, border-box !important;
+    @apply rounded-lg;
+} */
+
+.brand span:hover {
+    @apply shadow-xl cursor-pointer !important;
 }

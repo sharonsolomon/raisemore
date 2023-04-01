@@ -55,7 +55,8 @@ export function StatCard({ query, table, item }) {
 
     return (
         <Link href={item?.href} key={item.id}>
-            <div className="relative overflow-hidden bg-white px-4 pt-7 pb-0 sm:px-6 rounded-lg shadow-md border hover:shadow-lg hover:cursor-pointer">
+            {/* the below dev is a card with shadow, i want the shadow to be a purple and pink gradient */}
+            <div className="card relative bg-white px-4 pt-7 pb-0 sm:px-6 rounded-lg shadow-md border hover:shadow-lg hover:cursor-pointer">
                 <dt>
                     <div className="absolute rounded-md bg-blue-200 p-3">
                         <item.icon className="h-6 w-6 text-white" aria-hidden="true" />
