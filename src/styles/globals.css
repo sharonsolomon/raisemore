@@ -147,11 +147,11 @@ pre {
     @apply bg-gray-200;
 }
 
-main button[type]:not(.MuiButtonBase-root):not(.do-not-global-style):not(.btn-primary) {
+main button[type]:not(.do-not-global-style):not(.btn-primary) {
     @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
 }
 
-main button[disabled]:not(.MuiButtonBase-root):not(.do-not-global-style) {
+main button[disabled]:not(.do-not-global-style) {
     @apply bg-gray-200 text-gray-400 !important;
 }
 
@@ -159,19 +159,17 @@ main input[disabled]:-internal-autofill-selected {
     @apply bg-gray-200 !important;
 }
 
-main button[type]:not(.MuiButtonBase-root):not(.do-not-global-style):not(.btn-primary).button-sm {
+main button[type]:not(.do-not-global-style):not(.btn-primary).button-sm {
     @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
 }
 
-main button[type]:not(.MuiButtonBase-root):not(.do-not-global-style):not(.btn-primary).button-xs {
+main button[type]:not(.do-not-global-style):not(.btn-primary).button-xs {
     @apply inline-flex items-center rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
 }
 
 main
     .inline
-    button[type]:not(.MuiButtonBase-root):not(.do-not-global-style):not(.btn-primary).button-xs:not(
-        .unstyled-button
-    ) {
+    button[type]:not(.do-not-global-style):not(.btn-primary).button-xs:not(.unstyled-button) {
     @apply -mt-0.5 !important;
 }
 
@@ -242,19 +240,7 @@ button[type].btn-primary.button-xs:not(.do-not-global-style) {
 .MuiDataGrid-cell div {
     @apply text-gray-500 !important;
 }
-
-.MuiDataGrid-columnHeaders,
-.MuiDataGrid-columnHeaders div {
-    @apply font-semibold bg-gray-50 !important;
-    @apply border-b-gray-300 !important;
-}
-
-.MuiDataGrid-root {
-    @apply rounded-lg border-0 ring-1 ring-black ring-opacity-5 shadow !important;
-}
-/* .MuiDataGrid-virtualScrollerRenderZone {
-    @apply min-w-full divide-y divide-gray-300 !important;
-} */
+/* checkbox color */
 .MuiSvgIcon-root {
     color: #ccc !important;
 }
@@ -290,8 +276,12 @@ nav .border-t {
 /* .border-r {
     @apply border-r-gray-100;
 } */
-.link {
+.link,
+table a {
     @apply text-blue-600 underline;
+}
+table a {
+    @apply no-underline border-b text-blue-400 border-b-blue-300;
 }
 .shaded-page-header {
     @apply bg-gray-50 -mx-12 -mt-28 pt-24 -mb-2 pb-3 px-12;
@@ -412,7 +402,7 @@ main button:not(.unstyled-button) {
 }
 main button.button-xs:not(.unstyled-button),
 main button.button-sm:not(.unstyled-button),
-main .MuiBox-root button {
+main table button {
     @apply shadow-sm !important;
 }
 

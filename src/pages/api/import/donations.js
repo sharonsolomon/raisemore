@@ -5,8 +5,10 @@ const { v4: uuid } = require("uuid");
 const Papa = require("papaparse"); // Handles csvs
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { EMAIL_VALIDATION_REGEX } from "lib/validation";
+import { ObjectType } from "@clerk/nextjs/dist/api";
 // List of columns in order from csv file
 let permitTheseColumns = [
+    "person_id",
     "id",
     "batch_id",
     "organization_id",
@@ -322,6 +324,7 @@ export async function processDonations({
         batch_id: batchID,
     }));
     // Strip keys not present in newPersonFromDonationObject()
+    console.log("dropping some people keys");
     peopleToUpsert = stripKeys(
         peopleToUpsert,
         Object.keys({
@@ -388,6 +391,7 @@ export async function processDonations({
     console.timeEnd("upsert records into people");
 
     console.time("upload donations to db");
+    console.log("dropping some donation keys");
     const donationsToInsert = stripKeys(fileParsedToJSON, permitTheseColumns);
     const chunkSize = 100;
     const donationsInsertResults = [];
@@ -397,10 +401,12 @@ export async function processDonations({
         );
     }
 
+    const finalResponses = await Promise.allSettled(donationsInsertResults);
+
     // TODO: Need better error handling:
     console.timeEnd("upload donations to db");
 
-    return await Promise.allSettled(donationsInsertResults);
+    return finalResponses;
 }
 
 // Standarized!
@@ -440,12 +446,40 @@ function newPersonFromDonationObject(donation = {}) {
     };
 }
 
-function stripKeys(arr, permitTheseKeys) {
-    // TODO: or consider... This could be made faster by using more memory instead of a n^2 in-place search/delete
-    arr.forEach((row, index) => {
-        for (const key in row) {
-            if (!permitTheseKeys.includes(key)) delete arr[index][key];
-        }
-    });
-    return arr;
+export function stripKeys(arr, options) {
+    const randomLabel = Math.random().toString(36).substring(7);
+    console.time("stripkeys" + randomLabel);
+
+    const permitTheseKeys = Array.isArray(options) ? options : options.keep;
+    const requiredKeys = options?.require || [];
+
+    if (!Array.isArray(arr) || !(arr?.length > 0) || typeof arr[0] !== "object") return arr;
+
+    // Quick algorithm change, let's assume keys are the same in each row.
+    const approvedAndPresentKeyHash = permitTheseKeys.reduce((accumulator, key) => {
+        if (arr[0].hasOwnProperty(key)) accumulator[key] = true;
+        return accumulator;
+    }, {});
+
+    // Diff arr keys with approved keys
+    const keysWeAreDropping = Object.keys(arr[0]).filter(
+        (key) => !approvedAndPresentKeyHash.hasOwnProperty(key)
+    );
+    console.log({ keysWeAreDropping });
+
+    // Construct a new array with every row but only with the approved keys
+    const newArray = arr
+        ?.filter((row) =>
+            requiredKeys.every(
+                (requiredKey) => row.hasOwnProperty(requiredKey) && row[requiredKey] !== null
+            )
+        )
+        ?.map((row) =>
+            Object.keys(approvedAndPresentKeyHash).reduce((accumulator, key) => {
+                accumulator[key] = row[key];
+                return accumulator;
+            }, {})
+        );
+    console.timeEnd("stripkeys" + randomLabel);
+    return newArray;
 }

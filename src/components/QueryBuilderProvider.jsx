@@ -124,7 +124,7 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
                     />
                 </QueryBuilderBootstrap>
             </div>
-            <SupabaseTable table={table} currentQuery={formattedQuery} />
+            <SupabaseTable table={table} currentQuery={formattedQuery} queryObj={query} />
         </>
     );
 }

@@ -8,7 +8,7 @@ const { v4: uuid } = require("uuid");
 const Papa = require("papaparse"); // Handles csvs
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { EMAIL_VALIDATION_REGEX } from "lib/validation";
-import { cleanPhone } from "./donations";
+import { cleanPhone, stripKeys } from "./donations";
 
 // List of columns in order from csv file
 let permitTheseColumns = [
@@ -30,7 +30,7 @@ let permitTheseColumns = [
 // Standarized!
 function newPersonFromPledgeObject(data = {}) {
     const fields = Object.keys(data);
-    console.log({ fields });
+    // console.log({ fields });
     const phoneFields = Object.keys(data).filter(
         (field) => field.startsWith("donor_phone") || field.startsWith("phone")
     );
@@ -293,20 +293,5 @@ export default async function loadPledgesCSV(req, res) {
     // res.send(`File uploaded successfully, and ${fileParsedToJSON.length} records processed.`);
     return new Response(
         `File uploaded successfully, and ${fileParsedToJSON.length} records processed.`
-    );
-}
-
-function stripKeys(arr, options) {
-    const permitTheseKeys = Array.isArray(options) ? options : options.keep;
-    const requiredKeys = options?.require || [];
-    arr.forEach((row, index) => {
-        for (const key in row) {
-            if (!permitTheseKeys.includes(key)) delete arr[index][key];
-        }
-    });
-    return arr.filter((row) =>
-        requiredKeys.every(
-            (requiredKey) => row.hasOwnProperty(requiredKey) && row[requiredKey] !== null
-        )
     );
 }
