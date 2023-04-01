@@ -33,7 +33,7 @@ function App({ Component, pageProps }) {
                 ].map((url) => (
                     <Fragment key={url}>
                         <link rel="dns-prefetch" href={url} />
-                        <link rel="preconnect" href={url} crossorigin />
+                        <link rel="preconnect" href={url} crossOrigin />
                     </Fragment>
                 ))}
                 <style jsx global>
