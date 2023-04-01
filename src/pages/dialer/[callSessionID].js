@@ -64,6 +64,7 @@ export default function CallSessionPage() {
             .eq("id", callSessionID)
             .single()
     );
+    // TODO: remove /rq endpoint and use supabase directly
     const { data: peopleResponse } = useSWR(
         session?.saved_lists?.query
             ? `/api/rq?query=${encodeURIComponent(

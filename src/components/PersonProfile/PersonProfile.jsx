@@ -2,12 +2,13 @@ import Link from "next/link";
 import { useSupabase, useQuery } from "lib/supabaseHooks";
 import { useState, useEffect, useCallback, useMemo, useContext } from "react";
 import { PhoneIcon } from "@heroicons/react/20/solid";
-import { Tooltip } from "@mui/material";
 import { useUser } from "@clerk/nextjs";
 import { randomUUID } from "lib/randomUUID-polyfill";
 import { CallSessionContext } from "pages/dialer/[callSessionID]";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { capitalize, pluralize } from "lib/cases";
+
+import Tooltip from "@mui/material/Tooltip";
 
 import InteractionHistory from "./InteractionHistory";
 import Breadcrumbs from "components/Layout/Breadcrumbs";

@@ -8,7 +8,7 @@ export default function PeoplePage() {
             <div className="mx-auto max-w-7xl px-2 ">
                 <Breadcrumbs pages={[{ name: "Create a List", href: "/people", current: true }]} />
                 <PageTitle
-                    title="🙂&nbsp; Create a List"
+                    title="Create a List"
                     descriptor="Browse donors and prospects, create queries, and save lists."
                 />
             </div>

@@ -1,15 +1,8 @@
-import useSWR, { preload } from "swr";
-const fetcher = (url) => fetch(url).then((r) => r.json());
-import { useEffect, useState } from "react";
-// import Box from "@mui/material/Box";
-// import { DataGrid } from "@mui/x-data-grid";
-import Tooltip from "@mui/material/Tooltip";
-// import Stack from "@mui/material/Stack";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery, useSupabase } from "lib/supabaseHooks";
 import Table from "components/Table";
 import { compilePostgrestQuery } from "lib/compilePostgrestQuery";
-import { parseSQL } from "react-querybuilder";
 
 export default function SupabaseTable({
     table,

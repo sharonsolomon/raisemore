@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Tooltip from "@mui/material/Tooltip";
 
 const Table = ({ rows, columns, rowCount, onPageChange }) => {
     return (
@@ -14,7 +15,7 @@ const Table = ({ rows, columns, rowCount, onPageChange }) => {
                                             scope="col"
                                             key={column.field}
                                             className={
-                                                "px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-32 overflow-ellipsis" +
+                                                "px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-32 overflow-ellipsis " +
                                                 (i == 0 ? " py-3.5 pl-4 pr-3 sm:pl-6" : "")
                                             }
                                         >
@@ -27,21 +28,24 @@ const Table = ({ rows, columns, rowCount, onPageChange }) => {
                                 {(rows ?? [])?.map((row) => (
                                     <tr key={row.id}>
                                         {Object.entries(row)?.map(([columnName, value], i) => (
-                                            <td
-                                                key={row.id + columnName}
-                                                className={
-                                                    "whitespace-nowrap px-3 py-3 text-sm text-gray-500 w-32 overflow-ellipsis" +
-                                                    (i == 0 ? " pl-4 pr-3 sm:pl-6" : "")
-                                                }
-                                            >
-                                                {["first_name", "last_name"].includes(
-                                                    columnName
-                                                ) ? (
-                                                    <Link href={`/people/${row.id}`}>{value}</Link>
-                                                ) : (
-                                                    value
-                                                )}
-                                            </td>
+                                            <Tooltip title={value} key={row.id + columnName} arrow>
+                                                <td
+                                                    className={
+                                                        "whitespace-nowrap px-3 py-3 text-sm text-gray-500 w-32 overflow-ellipsis " +
+                                                        (i == 0 ? " pl-4 pr-3 sm:pl-6" : "")
+                                                    }
+                                                >
+                                                    {["first_name", "last_name"].includes(
+                                                        columnName
+                                                    ) ? (
+                                                        <Link href={`/people/${row.id}`}>
+                                                            {value}
+                                                        </Link>
+                                                    ) : (
+                                                        value
+                                                    )}
+                                                </td>
+                                            </Tooltip>
                                         ))}
                                     </tr>
                                 ))}

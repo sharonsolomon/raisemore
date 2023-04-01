@@ -47,6 +47,7 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
     // .replaceAll("like '%", "like '%");
     // console.log("formattedQuery", formattedQuery);
 
+    // TODO: remove /rq endpoint and use supabase directly
     const { data: rowsForColumns, error } = useSWR(
         `/api/rq?&query=${encodeURIComponent(`select * from ${table} where (1 = 1) limit 25`)}`,
         fetcher
