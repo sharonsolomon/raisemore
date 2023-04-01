@@ -23,6 +23,9 @@ function App({ Component, pageProps }) {
     `;
     return (
         <>
+            <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
+            <link rel="dns-prefetch" href="https://clerk.prompt.meerkat-85.lcl.dev" />
+            <link rel="dns-prefetch" href="https://app.papercups.io" />
             <style jsx global>
                 {globalCSS}
             </style>
