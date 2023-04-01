@@ -28,6 +28,7 @@ const Table = ({ rows, columns, rowCount, onPageChange }) => {
                                     <tr key={row.id}>
                                         {Object.entries(row)?.map(([columnName, value], i) => (
                                             <td
+                                                key={row.id + columnName}
                                                 className={
                                                     "whitespace-nowrap px-3 py-3 text-sm text-gray-500 w-32 overflow-ellipsis" +
                                                     (i == 0 ? " pl-4 pr-3 sm:pl-6" : "")
