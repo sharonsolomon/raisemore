@@ -1,12 +1,13 @@
 import useSWR, { preload } from "swr";
 const fetcher = (url) => fetch(url).then((r) => r.json());
 import { useState } from "react";
-import Box from "@mui/material/Box";
-import { DataGrid } from "@mui/x-data-grid";
+// import Box from "@mui/material/Box";
+// import { DataGrid } from "@mui/x-data-grid";
 import Tooltip from "@mui/material/Tooltip";
-import Stack from "@mui/material/Stack";
+// import Stack from "@mui/material/Stack";
 import { useRouter } from "next/router";
 import { useSupabase } from "lib/supabaseHooks";
+import Table from "components/Table";
 
 export default function SupabaseTable({
     table,
@@ -118,42 +119,48 @@ export default function SupabaseTable({
     });
 
     return (
-        <>
-            <Box sx={{ height: "53vh", width: "100%" }}>
-                <DataGrid
-                    components={{
-                        NoRowsOverlay: () => (
-                            <Stack height="100%" alignItems="center" justifyContent="center">
-                                No records
-                            </Stack>
-                        ),
-                    }}
-                    paginationMode="server"
-                    rowCount={Number(rowCount) || 0}
-                    loading={!data}
-                    rows={rows}
-                    columns={columns}
-                    pageSize={25}
-                    rowsPerPageOptions={[25]}
-                    checkboxSelection
-                    onPageChange={setPage}
-                    className="bg-white"
-                    // disable sorting and filtering
-                    disableColumnMenu
-                    rowHeight={44}
-                    sx={{
-                        fontSize: "0.85rem",
-                        my: 2,
-                        "& .MuiDataGrid-columnHeader .MuiDataGrid-columnSeparator": {
-                            display: "none",
-                        },
-                        // "& .MuiDataGrid-columnHeader": {
-                        //   fontWeight: "bold",
-                        // },
-                    }}
-                />
-            </Box>
-        </>
+        <Table
+            columns={columns.filter((a) => typeof a === "string")}
+            rows={rows}
+            rowCount={Number(rowCount) || 0}
+            onPageChange={setPage}
+        />
+        // <>
+        //     <Box sx={{ height: "53vh", width: "100%" }}>
+        //         <DataGrid
+        //             components={{
+        //                 NoRowsOverlay: () => (
+        //                     <Stack height="100%" alignItems="center" justifyContent="center">
+        //                         No records
+        //                     </Stack>
+        //                 ),
+        //             }}
+        //             paginationMode="server"
+        //             rowCount={Number(rowCount) || 0}
+        //             loading={!data}
+        //             rows={rows}
+        //             columns={columns}
+        //             pageSize={25}
+        //             rowsPerPageOptions={[25]}
+        //             checkboxSelection
+        //             onPageChange={setPage}
+        //             className="bg-white"
+        //             // disable sorting and filtering
+        //             disableColumnMenu
+        //             rowHeight={44}
+        //             sx={{
+        //                 fontSize: "0.85rem",
+        //                 my: 2,
+        //                 "& .MuiDataGrid-columnHeader .MuiDataGrid-columnSeparator": {
+        //                     display: "none",
+        //                 },
+        //                 // "& .MuiDataGrid-columnHeader": {
+        //                 //   fontWeight: "bold",
+        //                 // },
+        //             }}
+        //         />
+        //     </Box>
+        // </>
     );
 }
 

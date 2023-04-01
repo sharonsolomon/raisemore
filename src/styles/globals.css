@@ -403,18 +403,6 @@ button[type].unstyled-button {
 .desktop-sidebar {
     @apply top-0.5;
 }
-#wrapper {
-    @apply mt-0.5 relative;
-}
-#test {
-    @apply absolute top-0 left-0 w-full h-0.5 !important;
-    background: linear-gradient(
-        40deg,
-        rgba(0, 123, 255, 0.3) 30%,
-        rgba(255, 7, 110, 0.3) 100%
-    ) !important;
-}
-
 .page-title-descriptor {
     @apply mb-6;
 }
@@ -440,18 +428,22 @@ main .MuiBox-root button {
     @apply text-blue-600 bg-gray-100 rounded-full p-1 px-3 !important;
 }
 .Breadcrumbs a svg {
-    @apply text-gray-700 !important;
+    @apply text-gray-500 !important;
 }
 
-/* .gradient-purple-pink {
-    border: solid 1.5px transparent !important;
+.gradient-pink-purple {
+    border: solid 2px transparent !important;
     background-image: linear-gradient(white, white),
         radial-gradient(circle at top left, rgba(0, 123, 255, 0.4) 0%, rgba(255, 57, 110, 0.4) 100%) !important;
     background-origin: border-box !important;
     background-clip: padding-box, border-box !important;
-    @apply rounded-lg;
-} */
+    @apply ring-0 shadow-none text-gray-900 !important;
+}
 
 .brand span:hover {
     @apply shadow-xl cursor-pointer !important;
+}
+
+h2 {
+    /* @apply font-semibold !important; */
 }
