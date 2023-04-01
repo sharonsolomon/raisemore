@@ -4,8 +4,8 @@ import { CheckIcon } from "@heroicons/react/24/solid";
 import { RadioGroup } from "@headlessui/react";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { useOrganization } from "@clerk/nextjs";
-import { FilePond } from "react-filepond";
-import "filepond/dist/filepond.min.css";
+// import { FilePond } from "react-filepond";
+// import "filepond/dist/filepond.min.css";
 import { useSupabase } from "lib/supabaseHooks";
 import Breadcrumbs from "components/Layout/Breadcrumbs";
 import PageTitle from "components/Layout/PageTitle";
@@ -79,7 +79,7 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
     const supabase = useSupabase();
     const { organization } = useOrganization();
     const server = (apiRoute) => ({
-        process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+        process: (file, load) => {
             console.log("start process", file);
             console.time("upload and process");
 
@@ -98,7 +98,7 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
                 .then(({ data, error }) => {
                     console.log(data, error);
                     console.log("File available at", data.path);
-                    load("done");
+                    // load("done");
 
                     let fileProcessRequest = fetch(
                         "/api/import/" + apiRoute + "?fileName=" + encodeURIComponent(data.path)
@@ -377,5 +377,42 @@ function Choices({ importType, setImportType }) {
                 ))}
             </div>
         </RadioGroup>
+    );
+}
+
+function FilePond({ server }) {
+    const upload = (event) => {
+        console.log("upload()");
+        server.process(event.target.files[0]);
+    };
+    // return <input type="file" onChange={upload} />;
+    return (
+        <div className="col-span-full mt-4">
+            <label htmlFor="cover-photo" className=" sr-only">
+                File
+            </label>
+            <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                <div className="text-center">
+                    <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                        <label
+                            htmlFor="file-upload"
+                            className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                        >
+                            <span className="font-bold">Click to upload a file</span>
+
+                            <input
+                                type="file"
+                                id="file-upload"
+                                name="file-upload"
+                                className="sr-only"
+                                onChange={upload}
+                            />
+                        </label>
+                        {/* <p className="pl-1">or drag and drop</p> */}
+                    </div>
+                    <p className="text-xs leading-5 text-gray-600">.CSV only</p>
+                </div>
+            </div>
+        </div>
     );
 }
