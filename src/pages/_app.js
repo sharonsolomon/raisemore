@@ -36,11 +36,10 @@ function App({ Component, pageProps }) {
                         <link rel="preconnect" href={url} crossOrigin="true" />
                     </Fragment>
                 ))}
-                <style jsx global>
-                    {globalCSS}
-                </style>
             </Head>
-
+            <style jsx global>
+                {globalCSS}
+            </style>
             <SWRConfig value={optionsSWR}>
                 <ClerkProvider {...pageProps}>
                     <SupabaseWrapper>
