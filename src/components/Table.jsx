@@ -14,7 +14,7 @@ const Table = ({ rows, columns, rowCount, onPageChange }) => {
                                     {columns?.map((column, i) => (
                                         <th
                                             scope="col"
-                                            key={column.field}
+                                            key={column}
                                             className={
                                                 "px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-32 overflow-ellipsis " +
                                                 (i == 0 ? " py-3.5 pl-4 pr-3 sm:pl-6" : "")
@@ -29,26 +29,24 @@ const Table = ({ rows, columns, rowCount, onPageChange }) => {
                                 {(rows ?? [])?.map((row) => (
                                     <tr key={row.id}>
                                         {Object.entries(row)?.map(([columnName, value], i) => (
-                                            <Fragment key={row.id + columnName}>
-                                                <Tooltip title={value} arrow>
-                                                    <td
-                                                        className={
-                                                            "whitespace-nowrap px-3 py-3 text-sm text-gray-500 w-32 overflow-ellipsis " +
-                                                            (i == 0 ? " pl-4 pr-3 sm:pl-6" : "")
-                                                        }
-                                                    >
-                                                        {["first_name", "last_name"].includes(
-                                                            columnName
-                                                        ) ? (
-                                                            <Link href={`/people/${row.id}`}>
-                                                                {value}
-                                                            </Link>
-                                                        ) : (
-                                                            value
-                                                        )}
-                                                    </td>
-                                                </Tooltip>
-                                            </Fragment>
+                                            <Tooltip title={value} key={row.id + columnName} arrow>
+                                                <td
+                                                    className={
+                                                        "whitespace-nowrap px-3 py-3 text-sm text-gray-500 w-32 overflow-ellipsis " +
+                                                        (i == 0 ? " pl-4 pr-3 sm:pl-6" : "")
+                                                    }
+                                                >
+                                                    {["first_name", "last_name"].includes(
+                                                        columnName
+                                                    ) ? (
+                                                        <Link href={`/people/${row.id}`}>
+                                                            {value}
+                                                        </Link>
+                                                    ) : (
+                                                        value
+                                                    )}
+                                                </td>
+                                            </Tooltip>
                                         ))}
                                     </tr>
                                 ))}
