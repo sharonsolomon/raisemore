@@ -29,6 +29,7 @@ function App({ Component, pageProps }) {
                     "https://vitals.vercel-insights.com",
                     "https://clerk.prompt.meerkat-85.lcl.dev",
                     "https://app.papercups.io",
+                    "https://clerk.raisemore.app",
                 ].map((url) => (
                     <Fragment key={url}>
                         <link rel="dns-prefetch" href={url} />
