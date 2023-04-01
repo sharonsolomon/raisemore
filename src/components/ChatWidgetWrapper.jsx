@@ -47,7 +47,7 @@ export default function ChatWidgetWrapper() {
   },
 };`}
             </Script>
-            <script defer src="https://app.papercups.io/widget.js" />
+            <Script strategy="lazyOnload" src="https://app.papercups.io/widget.js" />
         </>
     );
     // return (
