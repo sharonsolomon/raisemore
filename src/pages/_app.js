@@ -1,5 +1,6 @@
+import Head from "next/head";
 import useSWR from "swr";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import "styles/globals.css";
 import Layout from "components/Layout/Layout";
 import { ClerkProvider, useAuth } from "@clerk/nextjs";
@@ -23,12 +24,22 @@ function App({ Component, pageProps }) {
     `;
     return (
         <>
-            <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
-            <link rel="dns-prefetch" href="https://clerk.prompt.meerkat-85.lcl.dev" />
-            <link rel="dns-prefetch" href="https://app.papercups.io" />
-            <style jsx global>
-                {globalCSS}
-            </style>
+            <Head>
+                {[
+                    "https://vitals.vercel-insights.com",
+                    "https://clerk.prompt.meerkat-85.lcl.dev",
+                    "https://app.papercups.io",
+                ].map((url) => (
+                    <Fragment key={url}>
+                        <link rel="dns-prefetch" href={url} />
+                        <link rel="preconnect" href={url} crossorigin />
+                    </Fragment>
+                ))}
+                <style jsx global>
+                    {globalCSS}
+                </style>
+            </Head>
+
             <SWRConfig value={optionsSWR}>
                 <ClerkProvider {...pageProps}>
                     <SupabaseWrapper>
