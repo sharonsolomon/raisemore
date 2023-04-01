@@ -10,9 +10,10 @@ export default function SupabaseTable({
     currentQuery,
     queryObj,
     setFilterColumns = () => {},
+    columns,
 }) {
     const [page, setPage] = useState(0);
-    let perPage = 25;
+    let perPage = 10;
 
     const supabase = useSupabase();
     const {
@@ -30,10 +31,8 @@ export default function SupabaseTable({
     );
     if (error) console.error(error);
 
-    let rowCount = rows?.count || 0;
+    let rowCount = (rows?.count || 0) + 0;
     if (rows && rows?.count) delete rows.count;
-
-    const columns = Object.keys(rows?.[0] ?? {});
 
     return (
         <Table
@@ -41,6 +40,7 @@ export default function SupabaseTable({
             rows={rows}
             rowCount={Number(rowCount) || 0}
             onPageChange={setPage}
+            page={page}
         />
     );
 }

@@ -23,8 +23,6 @@ import {
     update,
 } from "react-querybuilder";
 
-let fields = [];
-
 const initialQuery = {
     combinator: "and",
     rules: [],
@@ -47,18 +45,12 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
     // .replaceAll("like '%", "like '%");
     // console.log("formattedQuery", formattedQuery);
 
-    // TODO: remove /rq endpoint and use supabase directly
-    const { data: rowsForColumns, error } = useSWR(
-        `/api/rq?&query=${encodeURIComponent(`select * from ${table} where (1 = 1) limit 25`)}`,
-        fetcher
-    );
+    const { data: columns } = useQuery(supabase.rpc("columns", { tblname: table }));
 
-    if (rowsForColumns && rowsForColumns[0])
-        fields = Object.keys(rowsForColumns[0]).map((a) => ({
-            name: a,
-            label: a,
-        }));
-    else fields = [];
+    const fields = columns?.map((a) => ({
+        name: a,
+        label: a,
+    }));
 
     // add a filter rule
     const addRule = useCallback(() => {
@@ -125,7 +117,12 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
                     />
                 </QueryBuilderBootstrap>
             </div>
-            <SupabaseTable table={table} currentQuery={formattedQuery} queryObj={query} />
+            <SupabaseTable
+                table={table}
+                columns={columns}
+                currentQuery={formattedQuery}
+                queryObj={query}
+            />
         </>
     );
 }
