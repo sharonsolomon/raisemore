@@ -62,13 +62,15 @@ export function useSupabase() {
  * - isValidating: If true, the query is still running
  */
 export function useQuery(query) {
-    const context = useContext(SupabaseContext);
-
     const fetcher = async () => {
-        const { data, error } = await query;
+        const { data, error, count = null } = await query;
 
         if (error) {
             throw error;
+        }
+
+        if (count !== null) {
+            data.count = count;
         }
 
         return data;

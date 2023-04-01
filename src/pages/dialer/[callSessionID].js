@@ -2,13 +2,13 @@ import { Transition } from "@headlessui/react";
 import useSWR from "swr";
 const fetcher = (url) => fetch(url).then((r) => r.json());
 import { useRouter } from "next/router";
-// import PageTitle from "components/PageTitle";
+// import PageTitle from "components/Layout/PageTitle";
 import { PhoneIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect, useCallback, useReducer, createContext, useMemo } from "react";
 import { useQuery, useSupabase } from "lib/supabaseHooks";
 // import { parseSQL } from "react-querybuilder";
-import Breadcrumbs from "components/Breadcrumbs";
-import PersonProfile from "components/PersonProfile";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
+import PersonProfile from "components/PersonProfile/PersonProfile";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 
@@ -64,6 +64,7 @@ export default function CallSessionPage() {
             .eq("id", callSessionID)
             .single()
     );
+    // TODO: remove /rq endpoint and use supabase directly
     const { data: peopleResponse } = useSWR(
         session?.saved_lists?.query
             ? `/api/rq?query=${encodeURIComponent(
@@ -299,7 +300,7 @@ export default function CallSessionPage() {
                             {
                                 name: `Calling list "${session?.saved_lists?.name}"`,
                                 href: `/dialer/${callSessionID}`,
-                                current: false,
+                                current: true,
                             },
                         ]}
                     />
@@ -403,19 +404,19 @@ export default function CallSessionPage() {
                     }}
                 >
                     {session?.current_person_id && (
-                        <Transition
-                            appear={true}
-                            show={true}
-                            enter="ease-in duration-500"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="ease-out duration-60"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                            key={session.current_person_id}
-                        >
-                            <PersonProfile personID={session.current_person_id} />
-                        </Transition>
+                        // <Transition
+                        //     appear={true}
+                        //     show={true}
+                        //     enter="ease-in duration-500"
+                        //     enterFrom="opacity-0"
+                        //     enterTo="opacity-100"
+                        //     leave="ease-out duration-60"
+                        //     leaveFrom="opacity-100"
+                        //     leaveTo="opacity-0"
+                        //     key={session.current_person_id}
+                        // >
+                        <PersonProfile personID={session.current_person_id} />
+                        // </Transition>
                     )}
                 </CallSessionContext.Provider>
             </div>

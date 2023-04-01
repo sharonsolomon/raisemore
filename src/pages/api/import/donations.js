@@ -5,8 +5,10 @@ const { v4: uuid } = require("uuid");
 const Papa = require("papaparse"); // Handles csvs
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { EMAIL_VALIDATION_REGEX } from "lib/validation";
+import { ObjectType } from "@clerk/nextjs/dist/api";
 // List of columns in order from csv file
 let permitTheseColumns = [
+    "person_id",
     "id",
     "batch_id",
     "organization_id",
@@ -94,6 +96,8 @@ let permitTheseColumns = [
     "weekly_recurring_amount",
     "smart_boost_amount",
     "smart_boost_shown",
+    "bio",
+    "tags",
 ];
 
 // Load csv of donations to donation and people table
@@ -184,8 +188,9 @@ export function donationsCSVtoArray({ rawContent, batchID, orgID }) {
         organization_id: orgID,
     }));
 
+    // This is not necessary anymore because of later normalization before insert
     // Loop through every row and drop every key that is not present in permitTheseColumns
-    fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
+    // fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
 
     console.timeEnd("parse file");
 
@@ -221,14 +226,15 @@ export async function processDonations({
     // Keep track of who has been updated
     const peopleIndexesToUpsert = [],
         newEmails = [],
-        newPhones = [];
+        newPhones = [],
+        newTags = [];
 
     // Loop through donation objects
     for (let index = 0; index < fileParsedToJSON.length; index++) {
         const donation = fileParsedToJSON[index];
 
-        // Create an object to hold new information, desctructre to remove the email and phone
-        const { email, phone, ...newPerson } = {
+        // Create an object to hold new information, desctructre to remove the email and phones
+        const { tags, email, phones, ...newPerson } = {
             ...newPersonFromDonationObject(donation),
             batch_id: batchID,
             organization_id: orgID,
@@ -259,35 +265,44 @@ export async function processDonations({
             people[matchingIndex].emails = [...oldEmails, newEmailRecord];
             newEmails.push(newEmailRecord);
         }
-        // Phones
-        const validated_phone_number = Number(phone?.toString().replaceAll("[^0-9]", ""));
-        const phoneIsValid = validated_phone_number?.toString().length === 10;
-        // console.log(validated_phone_number);
-        // console.log(
-        //     !people[matchingIndex]?.phone_numbers
-        //         ?.map((phoneRecord) => phoneRecord.phone_number.toString().replaceAll("[^0-9]", ""))
-        //         .includes(validated_phone_number.toString())
-        // );
 
-        if (
-            phoneIsValid &&
-            (matchingIndex == people.length ||
-                !people[matchingIndex]?.phone_numbers
-                    ?.map((phoneRecord) =>
-                        phoneRecord.phone_number.toString().replaceAll("[^0-9]", "")
-                    )
-                    .includes(validated_phone_number.toString()))
-        ) {
-            const newPhoneRecord = {
-                phone_number: validated_phone_number,
-                person_id: personID,
-                batch_id: batchID,
-            };
-            const oldPhones = people[matchingIndex]?.phone_numbers || [];
-            people[matchingIndex].phone_numbers = [...oldPhones, newPhoneRecord];
-            newPhones.push(newPhoneRecord);
+        // Handle multiple phones
+        for (const phone of phones) {
+            const validated_phone_number = Number(phone?.toString().replaceAll("[^0-9]", ""));
+            const phoneIsValid = validated_phone_number?.toString().length === 10;
+            if (
+                phoneIsValid &&
+                (matchingIndex == people.length ||
+                    !people[matchingIndex]?.phone_numbers
+                        ?.map((phoneRecord) =>
+                            phoneRecord.phone_number.toString().replaceAll("[^0-9]", "")
+                        )
+                        .includes(validated_phone_number.toString()))
+            ) {
+                const newPhoneRecord = {
+                    phone_number: validated_phone_number,
+                    person_id: personID,
+                    batch_id: batchID,
+                };
+                const oldPhones = people[matchingIndex]?.phone_numbers || [];
+                people[matchingIndex].phone_numbers = [...oldPhones, newPhoneRecord];
+                newPhones.push(newPhoneRecord);
+            }
+            // TODO: else {throw a validation error;}
         }
-        // TODO: else {throw a validation error;}
+
+        // Tags!
+        tags?.split(",")
+            ?.map((tag) => tag.trim())
+            ?.filter((tag) => typeof tag === "string" && tag?.length > 0)
+            ?.forEach((tag) =>
+                newTags.push({
+                    tag,
+                    person_id: personID,
+                    organization_id: orgID,
+                    batch_id: batchID,
+                })
+            );
 
         // Adjust name and email hashes for future searches
         hashByFullname.set(newPerson.first_name + "|" + newPerson.last_name, matchingIndex);
@@ -309,6 +324,7 @@ export async function processDonations({
         batch_id: batchID,
     }));
     // Strip keys not present in newPersonFromDonationObject()
+    console.log("dropping some people keys");
     peopleToUpsert = stripKeys(
         peopleToUpsert,
         Object.keys({
@@ -361,39 +377,64 @@ export async function processDonations({
         console.error(emailsInsertResults?.error);
         return NextResponse.json(emailsInsertResults.error, { status: 400 });
     }
+
+    // Upsert tags
+    const { error: tagInsertError } = await supabase
+        .from("tags")
+        .upsert(newTags, { ignoreDuplicates: true })
+        .select("id");
+    if (tagInsertError) {
+        console.error(tagInsertError);
+        return NextResponse.json(tagInsertError, { status: 400 });
+    }
+
     console.timeEnd("upsert records into people");
 
     console.time("upload donations to db");
+    console.log("dropping some donation keys");
+    const donationsToInsert = stripKeys(fileParsedToJSON, permitTheseColumns);
     const chunkSize = 100;
     const donationsInsertResults = [];
     for (let i = 0; i < fileParsedToJSON.length; i += chunkSize) {
         donationsInsertResults.push(
-            supabase.from("donations").insert(fileParsedToJSON.slice(i, i + chunkSize))
+            supabase.from("donations").insert(donationsToInsert.slice(i, i + chunkSize))
         );
     }
+
+    const finalResponses = await Promise.allSettled(donationsInsertResults);
 
     // TODO: Need better error handling:
     console.timeEnd("upload donations to db");
 
-    return await Promise.allSettled(donationsInsertResults);
+    return finalResponses;
 }
 
 // Standarized!
-function newPersonFromDonationObject(donation) {
+export const cleanPhone = (phone) =>
+    Number(
+        phone
+            ?.trim()
+            .toString()
+            .replaceAll(/[^0-9]/g, "")
+            .substring(0, 10)
+    );
+
+function newPersonFromDonationObject(donation = {}) {
+    // Multiple phone fields
+    const phoneFields = Object.keys(donation).filter(
+        (field) => field.startsWith("donor_phone") || field.startsWith("phone")
+    );
+    const phones = phoneFields?.map((phoneField) => cleanPhone(donation[phoneField]));
     return {
         // Basic assignments
         last_name: donation?.donor_last_name?.trim(),
         first_name: donation?.donor_first_name?.trim(),
         email: donation?.donor_email?.trim(),
-        phone: Number(
-            donation?.donor_phone
-                ?.trim()
-                .toString()
-                .replaceAll(/[^0-9]/g, "")
-                .substring(0, 10)
-        ),
+        phones,
         employer: donation?.donor_employer?.trim(),
         occupation: donation?.donor_occupation?.trim(),
+        bio: donation?.bio?.trim(),
+        tags: donation?.tags?.trim(),
 
         // Address
         addr1: donation?.donor_addr1?.trim(),
@@ -405,11 +446,40 @@ function newPersonFromDonationObject(donation) {
     };
 }
 
-function stripKeys(arr, permitTheseKeys) {
-    arr.forEach((row, index) => {
-        for (const key in row) {
-            if (!permitTheseKeys.includes(key)) delete arr[index][key];
-        }
-    });
-    return arr;
+export function stripKeys(arr, options) {
+    const randomLabel = Math.random().toString(36).substring(7);
+    console.time("stripkeys" + randomLabel);
+
+    const permitTheseKeys = Array.isArray(options) ? options : options.keep;
+    const requiredKeys = options?.require || [];
+
+    if (!Array.isArray(arr) || !(arr?.length > 0) || typeof arr[0] !== "object") return arr;
+
+    // Quick algorithm change, let's assume keys are the same in each row.
+    const approvedAndPresentKeyHash = permitTheseKeys.reduce((accumulator, key) => {
+        if (arr[0].hasOwnProperty(key)) accumulator[key] = true;
+        return accumulator;
+    }, {});
+
+    // Diff arr keys with approved keys
+    const keysWeAreDropping = Object.keys(arr[0]).filter(
+        (key) => !approvedAndPresentKeyHash.hasOwnProperty(key)
+    );
+    console.log({ keysWeAreDropping });
+
+    // Construct a new array with every row but only with the approved keys
+    const newArray = arr
+        ?.filter((row) =>
+            requiredKeys.every(
+                (requiredKey) => row.hasOwnProperty(requiredKey) && row[requiredKey] !== null
+            )
+        )
+        ?.map((row) =>
+            Object.keys(approvedAndPresentKeyHash).reduce((accumulator, key) => {
+                accumulator[key] = row[key];
+                return accumulator;
+            }, {})
+        );
+    console.timeEnd("stripkeys" + randomLabel);
+    return newArray;
 }

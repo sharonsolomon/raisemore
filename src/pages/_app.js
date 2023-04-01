@@ -1,7 +1,8 @@
+import Head from "next/head";
 import useSWR from "swr";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import "styles/globals.css";
-import Layout from "components/Layout";
+import Layout from "components/Layout/Layout";
 import { ClerkProvider, useAuth } from "@clerk/nextjs";
 import ChatWidgetWrapper from "components/ChatWidgetWrapper";
 import { createSupabaseClient, SupabaseProvider } from "lib/supabaseHooks";
@@ -9,6 +10,7 @@ import { SWRConfig, useSWRConfig } from "swr";
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 import { Analytics } from "@vercel/analytics/react";
+import { ToastContainer } from "react-toastify";
 
 function App({ Component, pageProps }) {
     const optionsSWR = {
@@ -22,9 +24,23 @@ function App({ Component, pageProps }) {
     `;
     return (
         <>
-            <style jsx global>
-                {globalCSS}
-            </style>
+            <Head>
+                {[
+                    "https://vitals.vercel-insights.com",
+                    "https://clerk.prompt.meerkat-85.lcl.dev",
+                    "https://app.papercups.io",
+                    "https://clerk.raisemore.app",
+                ].map((url) => (
+                    <Fragment key={url}>
+                        <link rel="dns-prefetch" href={url} />
+                        <link rel="preconnect" href={url} crossorigin />
+                    </Fragment>
+                ))}
+                <style jsx global>
+                    {globalCSS}
+                </style>
+            </Head>
+
             <SWRConfig value={optionsSWR}>
                 <ClerkProvider {...pageProps}>
                     <SupabaseWrapper>
@@ -33,6 +49,7 @@ function App({ Component, pageProps }) {
                 </ClerkProvider>
             </SWRConfig>
             <Analytics />
+            <ToastContainer />
         </>
     );
 }

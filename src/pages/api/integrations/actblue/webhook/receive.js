@@ -3,8 +3,10 @@ export const config = { runtime: "edge" };
 import { createSupabaseClient } from "lib/supabaseHooks";
 
 export default async function handler(req) {
+    console.log("receive actblue webhook handler()");
+
     if (req.method !== "POST") {
-        return new Response(null, {
+        return Response.json(null, {
             status: 405,
             statusText: "Actblue webhook must be a POST request",
         });
@@ -26,7 +28,7 @@ export default async function handler(req) {
     const authValue = basicAuth?.toString()?.split(" ")[1];
     const [user, pwd] = atob(authValue).split(":");
     if (!basicAuth || !user) {
-        return new Response(null, {
+        return Response.json(null, {
             status: 401,
             statusText: "Unauthorized Request",
         });
@@ -49,7 +51,7 @@ export default async function handler(req) {
     const { data, error } = await supabaseServiceRole
         .from("actblue_webhooks")
         .insert({
-            first_line_item_id: webhook_body.lineitems[0].lineitemid,
+            first_line_item_id: webhook_body.lineitems[0].lineitemId,
             webhook_body,
             organization_id,
         })
@@ -64,8 +66,7 @@ export default async function handler(req) {
     // console.log({ data, error });
     const { id } = data;
 
-    // And trigger the next function to process it
-    fetch(process.env.ENVIRONMENT_URL + "/api/integrations/actblue/processWebhook", {
+    await fetch(process.env.ENVIRONMENT_URL + "/api/integrations/actblue/webhook/process", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

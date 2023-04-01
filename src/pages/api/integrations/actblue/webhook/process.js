@@ -2,9 +2,10 @@ const { v4: uuid } = require("uuid");
 import { NextResponse } from "next/server";
 export const config = { runtime: "edge" };
 import { createSupabaseClient } from "lib/supabaseHooks";
-import { processDonations } from "pages/api/loadDonationsCSV";
+import { processDonations } from "pages/api/import/donations";
 
 export default async function handler(req) {
+    console.log("process actblue webhook handler()");
     console.time("processWebhook");
 
     if (req.method !== "POST") {

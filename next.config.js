@@ -1,10 +1,29 @@
-// This file sets a custom webpack configuration to use your Next.js app
-// with Sentry.
-// https://nextjs.org/docs/api-reference/next.config.js/introduction
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 // const { withSentryConfig } = require("@sentry/nextjs");
 
-/** @type {import('next').NextConfig} */
+const securityHeaders = [
+    {
+        key: "X-DNS-Prefetch-Control",
+        value: "on",
+    },
+    {
+        key: "X-Content-Type-Options",
+        value: "nosniff",
+    },
+    {
+        key: "X-Frame-Options",
+        value: "sameorigin",
+    },
+    {
+        key: "X-XSS-Protection",
+        value: "1; mode=block",
+    },
+    {
+        key: "Referrer-Policy",
+        value: "same-origin",
+    },
+    // TODO: add a proper Content-Security-Policy that includes clerk and supabase
+];
+
 const nextConfig = {
     reactStrictMode: true,
     compiler: {
@@ -29,6 +48,15 @@ const nextConfig = {
                 pathname: "**",
             },
         ],
+    },
+    async headers() {
+        return [
+            {
+                // Apply these headers to all routes in your application.
+                source: "/:path*",
+                headers: securityHeaders,
+            },
+        ];
     },
 };
 

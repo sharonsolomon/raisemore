@@ -34,7 +34,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
 }
 
-function SearchModal({ setOpen, open }) {
+function SearchModal({ setOpen, open = false }) {
     const [query, setQuery] = useState("");
     const router = useRouter();
 

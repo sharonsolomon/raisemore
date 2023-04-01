@@ -1,8 +1,5 @@
 import { UserIcon } from "@heroicons/react/20/solid";
-
-function capitalize(input) {
-    return input?.length > 0 ? input.charAt(0).toUpperCase() + input.slice(1) : "";
-}
+import { capitalize } from "lib/cases";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ");

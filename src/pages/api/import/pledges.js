@@ -8,6 +8,7 @@ const { v4: uuid } = require("uuid");
 const Papa = require("papaparse"); // Handles csvs
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { EMAIL_VALIDATION_REGEX } from "lib/validation";
+import { cleanPhone, stripKeys } from "./donations";
 
 // List of columns in order from csv file
 let permitTheseColumns = [
@@ -21,19 +22,27 @@ let permitTheseColumns = [
     "phone",
     "pledge",
     "amount",
+    "tags",
+    "bio",
     // More people IDs to permit?
 ];
 
 // Standarized!
-function newPersonFromPledgeObject(data) {
-    // This is a placeholder function for manipulating
-    // column headers and adding metadata later
+function newPersonFromPledgeObject(data = {}) {
+    const fields = Object.keys(data);
+    // console.log({ fields });
+    const phoneFields = Object.keys(data).filter(
+        (field) => field.startsWith("donor_phone") || field.startsWith("phone")
+    );
+    const phones = phoneFields?.map((phoneField) => cleanPhone(data[phoneField]));
     const normalized = {
         first_name: data?.first_name,
         last_name: data?.last_name,
         zip: data?.zip,
         email: data?.email,
-        phone: data?.phone,
+        phones,
+        bio: data?.bio,
+        tags: data?.tags,
     };
     return normalized;
 }
@@ -100,8 +109,9 @@ export default async function loadPledgesCSV(req, res) {
         organization_id: orgID,
     }));
 
+    // This is not necessary anymore because of later normalization before insert
     // Loop through every row and drop every key that is not present in permitTheseColumns
-    fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
+    // fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
 
     // Grab the people collection as an array of rows
     console.time("people query");
@@ -124,14 +134,15 @@ export default async function loadPledgesCSV(req, res) {
     // Keep track of who has been updated
     const peopleIndexesToUpsert = [],
         newEmails = [],
-        newPhones = [];
+        newPhones = [],
+        newTags = [];
 
     // Loop through pledge objects
     for (let index = 0; index < fileParsedToJSON.length; index++) {
         const pledge = fileParsedToJSON[index];
 
         // Create an object to hold new information, desctructre to remove the email and phone
-        const { email, phone, ...newPerson } = {
+        const { tags, bio, email, phones, ...newPerson } = {
             ...newPersonFromPledgeObject(pledge),
             batch_id: batchID,
             organization_id: orgID,
@@ -162,35 +173,44 @@ export default async function loadPledgesCSV(req, res) {
             people[matchingIndex].emails = [...oldEmails, newEmailRecord];
             newEmails.push(newEmailRecord);
         }
-        // Phones
-        const validated_phone_number = Number(phone?.toString().replaceAll("[^0-9]", ""));
-        const phoneIsValid = validated_phone_number?.toString().length === 10;
-        // console.log(validated_phone_number);
-        // console.log(
-        //     !people[matchingIndex]?.phone_numbers
-        //         ?.map((phoneRecord) => phoneRecord.phone_number.toString().replaceAll("[^0-9]", ""))
-        //         .includes(validated_phone_number.toString())
-        // );
 
-        if (
-            phoneIsValid &&
-            (matchingIndex == people.length ||
-                !people[matchingIndex]?.phone_numbers
-                    ?.map((phoneRecord) =>
-                        phoneRecord.phone_number.toString().replaceAll("[^0-9]", "")
-                    )
-                    .includes(validated_phone_number.toString()))
-        ) {
-            const newPhoneRecord = {
-                phone_number: validated_phone_number,
-                person_id: personID,
-                batch_id: batchID,
-            };
-            const oldPhones = people[matchingIndex]?.phone_numbers || [];
-            people[matchingIndex].phone_numbers = [...oldPhones, newPhoneRecord];
-            newPhones.push(newPhoneRecord);
+        // Handle multiple phones
+        for (const phone of phones) {
+            const validated_phone_number = Number(phone?.toString().replaceAll("[^0-9]", ""));
+            const phoneIsValid = validated_phone_number?.toString().length === 10;
+            if (
+                phoneIsValid &&
+                (matchingIndex == people.length ||
+                    !people[matchingIndex]?.phone_numbers
+                        ?.map((phoneRecord) =>
+                            phoneRecord.phone_number.toString().replaceAll("[^0-9]", "")
+                        )
+                        .includes(validated_phone_number.toString()))
+            ) {
+                const newPhoneRecord = {
+                    phone_number: validated_phone_number,
+                    person_id: personID,
+                    batch_id: batchID,
+                };
+                const oldPhones = people[matchingIndex]?.phone_numbers || [];
+                people[matchingIndex].phone_numbers = [...oldPhones, newPhoneRecord];
+                newPhones.push(newPhoneRecord);
+            }
+            // TODO: else {throw a validation error;}
         }
-        // TODO: else {throw a validation error;}
+
+        // Tags!
+        tags?.split(",")
+            ?.map((tag) => tag.trim())
+            ?.filter((tag) => typeof tag === "string" && tag?.length > 0)
+            ?.forEach((tag) =>
+                newTags.push({
+                    tag,
+                    person_id: personID,
+                    organization_id: orgID,
+                    batch_id: batchID,
+                })
+            );
 
         // Adjust name and email hashes for future searches
         hashByFullname.set(newPerson.first_name + "|" + newPerson.last_name, matchingIndex);
@@ -233,6 +253,16 @@ export default async function loadPledgesCSV(req, res) {
         .select("id");
     if (emailsInsertResults?.error) throw emailsInsertResults.error;
 
+    // Upsert tags
+    const { error: tagInsertError } = await supabase
+        .from("tags")
+        .upsert(newTags, { ignoreDuplicates: true })
+        .select("id");
+    if (tagInsertError) {
+        console.error(tagInsertError);
+        return NextResponse.json(tagInsertError, { status: 400 });
+    }
+
     console.timeEnd("upsert records into people");
 
     console.time("upload pledges to db");
@@ -263,20 +293,5 @@ export default async function loadPledgesCSV(req, res) {
     // res.send(`File uploaded successfully, and ${fileParsedToJSON.length} records processed.`);
     return new Response(
         `File uploaded successfully, and ${fileParsedToJSON.length} records processed.`
-    );
-}
-
-function stripKeys(arr, options) {
-    const permitTheseKeys = Array.isArray(options) ? options : options.keep;
-    const requiredKeys = options?.require || [];
-    arr.forEach((row, index) => {
-        for (const key in row) {
-            if (!permitTheseKeys.includes(key)) delete arr[index][key];
-        }
-    });
-    return arr.filter((row) =>
-        requiredKeys.every(
-            (requiredKey) => row.hasOwnProperty(requiredKey) && row[requiredKey] !== null
-        )
     );
 }

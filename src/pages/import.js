@@ -4,11 +4,11 @@ import { CheckIcon } from "@heroicons/react/24/solid";
 import { RadioGroup } from "@headlessui/react";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { useOrganization } from "@clerk/nextjs";
-import { FilePond } from "react-filepond";
-import "filepond/dist/filepond.min.css";
+// import { FilePond } from "react-filepond";
+// import "filepond/dist/filepond.min.css";
 import { useSupabase } from "lib/supabaseHooks";
-import Breadcrumbs from "components/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
+import PageTitle from "components/Layout/PageTitle";
 
 export default function Import() {
     const [step, setStep] = useState(1);
@@ -79,7 +79,7 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
     const supabase = useSupabase();
     const { organization } = useOrganization();
     const server = (apiRoute) => ({
-        process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+        process: (file, load) => {
             console.log("start process", file);
             console.time("upload and process");
 
@@ -98,10 +98,10 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
                 .then(({ data, error }) => {
                     console.log(data, error);
                     console.log("File available at", data.path);
-                    load("done");
+                    // load("done");
 
                     let fileProcessRequest = fetch(
-                        "/api/" + apiRoute + "?fileName=" + encodeURIComponent(data.path)
+                        "/api/import/" + apiRoute + "?fileName=" + encodeURIComponent(data.path)
                     );
 
                     nextStep();
@@ -126,9 +126,9 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
             };
         },
     });
-    const loadDonationsCSV = server("loadDonationsCSV");
-    const loadProspectsCSV = server("loadPledgesCSV");
-    const loadPledgesCSV = server("loadPledgesCSV");
+    const loadDonationsCSV = server("donations");
+    const loadProspectsCSV = server("pledges");
+    const loadPledgesCSV = server("pledges");
     return (
         <>
             {importType == "donations" && (
@@ -290,7 +290,7 @@ function Steps({ step: currentStepNum }) {
     );
 }
 
-const mailingLists = [
+const importChoices = [
     {
         id: 1,
         title: "Donations",
@@ -312,7 +312,7 @@ const mailingLists = [
 ];
 
 function Choices({ importType, setImportType }) {
-    console.log(importType);
+    console.log({ importType });
     return (
         <RadioGroup
             value={importType}
@@ -326,45 +326,39 @@ function Choices({ importType, setImportType }) {
             </RadioGroup.Label>
 
             <div className="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
-                {mailingLists.map((mailingList) => (
+                {importChoices.map((importChoice) => (
                     <RadioGroup.Option
-                        key={mailingList.id}
-                        value={mailingList}
+                        key={importChoice.id}
+                        value={importChoice}
                         className={({ checked, active }) =>
                             classNames(
                                 checked ? "border-transparent" : "border-gray-300",
                                 active ? "border-indigo-500 ring-2 ring-indigo-500" : "",
-                                "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow-sm focus:outline-none"
+                                "relative flex cursor-pointer rounded-lg border bg-white p-4 shadow hover:shadow-lg focus:outline-none"
                             )
                         }
                     >
-                        {({ checked, active }) => (
+                        {({ active }) => (
                             <>
                                 <span className="flex flex-1">
-                                    <span className="flex flex-col">
+                                    <span className="flex flex-col pt-1 pb-4">
                                         <RadioGroup.Label
                                             as="span"
                                             className="block text-sm font-medium text-gray-900"
                                         >
-                                            {mailingList.title}
+                                            {importChoice.title}
                                         </RadioGroup.Label>
                                         <RadioGroup.Description
                                             as="span"
                                             className="mt-1 flex items-center text-sm text-gray-500"
                                         >
-                                            {mailingList.description}
-                                        </RadioGroup.Description>
-                                        <RadioGroup.Description
-                                            as="span"
-                                            className="mt-8 text-sm font-medium text-gray-900"
-                                        >
-                                            {/* {mailingList.users} */}
+                                            {importChoice.description}
                                         </RadioGroup.Description>
                                     </span>
                                 </span>
                                 <CheckCircleIcon
                                     className={classNames(
-                                        !checked ? "invisible" : "",
+                                        !active ? "invisible" : "",
                                         "h-5 w-5 text-indigo-600"
                                     )}
                                     aria-hidden="true"
@@ -372,7 +366,7 @@ function Choices({ importType, setImportType }) {
                                 <span
                                     className={classNames(
                                         active ? "border" : "border-2",
-                                        checked ? "border-indigo-500" : "border-transparent",
+                                        active ? "border-indigo-500" : "border-transparent",
                                         "pointer-events-none absolute -inset-px rounded-lg"
                                     )}
                                     aria-hidden="true"
@@ -383,5 +377,42 @@ function Choices({ importType, setImportType }) {
                 ))}
             </div>
         </RadioGroup>
+    );
+}
+
+function FilePond({ server }) {
+    const upload = (event) => {
+        console.log("upload()");
+        server.process(event.target.files[0]);
+    };
+    // return <input type="file" onChange={upload} />;
+    return (
+        <div className="col-span-full mt-4">
+            <label htmlFor="cover-photo" className=" sr-only">
+                File
+            </label>
+            <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                <div className="text-center">
+                    <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                        <label
+                            htmlFor="file-upload"
+                            className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                        >
+                            <span className="font-bold">Click to upload a file</span>
+
+                            <input
+                                type="file"
+                                id="file-upload"
+                                name="file-upload"
+                                className="sr-only"
+                                onChange={upload}
+                            />
+                        </label>
+                        {/* <p className="pl-1">or drag and drop</p> */}
+                    </div>
+                    <p className="text-xs leading-5 text-gray-600">.CSV only</p>
+                </div>
+            </div>
+        </div>
     );
 }

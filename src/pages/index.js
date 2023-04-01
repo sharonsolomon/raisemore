@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSupabase, useQuery } from "lib/supabaseHooks";
-import Breadcrumbs from "components/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
+import PageTitle from "components/Layout/PageTitle";
 import CallingSessionsGrid from "components/CallingSessionsGrid";
 import { clerkClient, getAuth, buildClerkProps } from "@clerk/nextjs/server";
 import { CurrencyDollarIcon, HandRaisedIcon, PhoneIcon } from "@heroicons/react/24/outline";
@@ -55,7 +55,8 @@ export function StatCard({ query, table, item }) {
 
     return (
         <Link href={item?.href} key={item.id}>
-            <div className="relative overflow-hidden bg-white px-4 pt-7 pb-0 sm:px-6 rounded-lg shadow-md border hover:shadow-lg hover:cursor-pointer">
+            {/* the below dev is a card with shadow, i want the shadow to be a purple and pink gradient */}
+            <div className="card relative bg-white px-4 pt-7 pb-0 sm:px-6 rounded-lg shadow-md border hover:shadow-lg hover:cursor-pointer">
                 <dt>
                     <div className="absolute rounded-md bg-blue-200 p-3">
                         <item.icon className="h-6 w-6 text-white" aria-hidden="true" />
@@ -75,7 +76,7 @@ export default function Home(props) {
     return (
         <div className="">
             <div className="mx-auto max-w-7xl px-2">
-                <Breadcrumbs pages={[{ name: "Dashboard", href: "/", current: false }]} />
+                <Breadcrumbs pages={[{ name: "Dashboard", href: "/", current: true }]} />
                 <PageTitle
                     title="👋&nbsp; Dashboard"
                     descriptor="Welcome to your fundraising home base!"

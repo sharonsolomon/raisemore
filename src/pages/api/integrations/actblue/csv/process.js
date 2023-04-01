@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 export const config = { runtime: "edge" };
 import { createSupabaseClient } from "lib/supabaseHooks";
-import { processDonations, donationsCSVtoArray } from "pages/api/loadDonationsCSV";
+import { processDonations, donationsCSVtoArray } from "pages/api/import/donations";
 import { BASE_URI } from "pages/api/integrations/actblue/csv/request";
 import { v4 as uuid } from "uuid";
 
@@ -57,10 +57,12 @@ export default async function handler(req) {
             status: "processed",
         })
         .eq("actblue_request_id", id)
-        .eq("organization_id", orgID)
-        .single();
+        .eq("organization_id", orgID);
     if (updateError) {
         console.error(updateError);
         return NextResponse.json(updateError, { status: 500 });
     }
+    console.log("CSV processed");
+    console.log({ updateData, resultingPromiseResults });
+    return NextResponse.json({ updateData, resultingPromiseResults });
 }

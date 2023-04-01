@@ -1,14 +1,14 @@
 import QueryBuilderProvider from "components/QueryBuilderProvider";
-import Breadcrumbs from "components/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
+import PageTitle from "components/Layout/PageTitle";
 
 export default function PeoplePage() {
     return (
         <div className="">
             <div className="mx-auto max-w-7xl px-2 ">
-                <Breadcrumbs pages={[{ name: "Create a List", href: "/people", current: false }]} />
+                <Breadcrumbs pages={[{ name: "Create a List", href: "/people", current: true }]} />
                 <PageTitle
-                    title="🙂&nbsp; Create a List"
+                    title="Create a List"
                     descriptor="Browse donors and prospects, create queries, and save lists."
                 />
             </div>

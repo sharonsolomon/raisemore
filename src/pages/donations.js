@@ -1,6 +1,6 @@
 import QueryBuilderProvider from "components/QueryBuilderProvider";
-import Breadcrumbs from "components/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
+import PageTitle from "components/Layout/PageTitle";
 
 export default function Dashboard() {
     return (

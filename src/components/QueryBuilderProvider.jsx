@@ -47,6 +47,7 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
     // .replaceAll("like '%", "like '%");
     // console.log("formattedQuery", formattedQuery);
 
+    // TODO: remove /rq endpoint and use supabase directly
     const { data: rowsForColumns, error } = useSWR(
         `/api/rq?&query=${encodeURIComponent(`select * from ${table} where (1 = 1) limit 25`)}`,
         fetcher
@@ -101,7 +102,8 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
 
                     <button
                         onClick={addRule}
-                        className="my-1 mx-2 relative inline-block justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+                        type="button"
+                        className="btn-primary my-1 mx-2 relative inline-block justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100"
                     >
                         Add Filter Step
                     </button>
@@ -123,7 +125,7 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
                     />
                 </QueryBuilderBootstrap>
             </div>
-            <SupabaseTable table={table} currentQuery={formattedQuery} />
+            <SupabaseTable table={table} currentQuery={formattedQuery} queryObj={query} />
         </>
     );
 }

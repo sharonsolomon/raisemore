@@ -1,6 +1,7 @@
 import Tooltip from "@mui/material/Tooltip";
 import { useState } from "react";
 import { EMAIL_VALIDATION_REGEX } from "lib/validation";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
 function phoneNumberDisplayFormatter(input) {
     if (typeof input === "undefined") return null;
@@ -34,7 +35,7 @@ function emailDisplayFormatter(input) {
         return input;
     }
     return (
-        <Tooltip title="Invalid email" arrow>
+        <Tooltip title="Invalid email">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                 {input}
             </span>
@@ -50,6 +51,7 @@ export default function PersonContactInfo({
     deleteEmail,
     restorePhone,
     restoreEmail,
+    makePrimaryPhone,
 }) {
     let [newPhone, setNewPhone] = useState(null);
     let [newEmail, setNewEmail] = useState(null);
@@ -61,20 +63,36 @@ export default function PersonContactInfo({
                 {person.phone_numbers?.map((phone_number) => (
                     <dd className="mt-1 text-sm text-gray-900" key={phone_number.id}>
                         <div className="overflow-ellipsis">
-                            <span className={phone_number.remove_date && "line-through"}>
+                            <span
+                                className={
+                                    (phone_number.remove_date && " line-through") +
+                                    (phone_number?.primary_for && " font-bold")
+                                }
+                            >
                                 {phoneNumberDisplayFormatter(phone_number.phone_number)}
                             </span>
 
                             {!phone_number.remove_date ? (
-                                <button
-                                    type="button"
-                                    className="do-not-global-style text-red-600 px-1"
-                                    onClick={() => {
-                                        deletePhone(phone_number.id);
-                                    }}
-                                >
-                                    x
-                                </button>
+                                <>
+                                    <button
+                                        type="button"
+                                        className="do-not-global-style text-red-600 px-1"
+                                        onClick={() => {
+                                            deletePhone(phone_number.id);
+                                        }}
+                                    >
+                                        <XMarkIcon className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="do-not-global-style text-red-600 px-1"
+                                        onClick={() => {
+                                            makePrimaryPhone(phone_number.id);
+                                        }}
+                                    >
+                                        make p
+                                    </button>
+                                </>
                             ) : (
                                 <button
                                     type="button"

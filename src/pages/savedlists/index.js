@@ -3,8 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import SupabaseTable from "components/SupabaseTable";
 import { useState, useEffect } from "react";
-import Breadcrumbs from "components/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
+import PageTitle from "components/Layout/PageTitle";
 
 export default function Dashboard() {
     return (
@@ -12,7 +12,7 @@ export default function Dashboard() {
             <div className="mx-auto max-w-7xl px-2">
                 <Breadcrumbs pages={[{ name: "Lists", href: "/savedlists", current: true }]} />
                 <PageTitle
-                    title="📋&nbsp; Lists"
+                    title="Lists"
                     descriptor="Edit existing lists, or use one to launch a new call session."
                 />
             </div>

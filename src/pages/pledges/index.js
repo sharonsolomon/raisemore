@@ -3,8 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import SupabaseTable from "components/SupabaseTable";
 import { useState, useEffect } from "react";
-import Breadcrumbs from "components/Breadcrumbs";
-import PageTitle from "components/PageTitle";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
+import PageTitle from "components/Layout/PageTitle";
 import { PlusCircleIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 export default function Dashboard() {
