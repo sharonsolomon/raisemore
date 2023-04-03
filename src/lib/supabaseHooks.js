@@ -70,9 +70,7 @@ export function useQuery(query) {
         }
 
         if (typeof count === "number") {
-            console.log({ count });
             data.count = count;
-            console.log(data.count);
         }
 
         return data;

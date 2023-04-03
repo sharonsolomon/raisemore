@@ -10,13 +10,12 @@ export default function SupabaseTable({
     currentQuery,
     queryObj,
     setFilterColumns = () => {},
-    columns,
 }) {
     const [page, setPage] = useState(0);
     let perPage = 10;
 
     const supabase = useSupabase();
-    const {
+    let {
         data: rows,
         error,
         mutate,
@@ -33,7 +32,20 @@ export default function SupabaseTable({
 
     let rowCount = Number(rows?.count || 0);
     console.log({ rowCount });
-    // if (rows && rows?.count) delete rows.count;
+    if (rows && rows?.count) delete rows.count;
+
+    let { data: columns } = useQuery(supabase.rpc("columns", { tblname: table }));
+
+    if (table === "saved_lists" && columns && rows?.length) {
+        // columns?.push("Edit query");
+        // columns?.push("New call session");
+        columns = [...columns, "Edit query", "New call session"];
+        rows = rows.map((row) => ({
+            ...row,
+            "Edit query": <LoadListButton row={row} />,
+            "New call session": <MakeCallsButton row={row} />,
+        }));
+    }
 
     return (
         <Table

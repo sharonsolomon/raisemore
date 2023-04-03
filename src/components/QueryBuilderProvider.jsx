@@ -36,7 +36,11 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
     const { data: list, mutate: fetchList } = useQuery(
         listID && supabase.from("saved_lists").select().eq("id", listID).single()
     );
-    if (query == initialQuery && list?.query) setQuery(parseSQL(list.query));
+
+    // Keep the local temporary state in line with the serverside on any serverside changes
+    useEffect(() => {
+        if (list?.query) setQuery(parseSQL(list.query));
+    }, [list?.query]);
 
     var formattedQuery = formatQuery(query, {
         format: "sql",

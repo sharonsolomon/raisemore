@@ -57,7 +57,9 @@ export const compilePostgrestQuery = ({ currentQuery, supabase, table, page, per
         );
     });
 
-    queryWithFilters = queryWithFilters.range(page * perPage, (page + 1) * perPage - 1);
+    if (typeof perPage !== "undefined") {
+        queryWithFilters = queryWithFilters.range(page * perPage, (page + 1) * perPage - 1);
+    }
 
     return queryWithFilters;
 };
