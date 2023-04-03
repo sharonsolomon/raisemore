@@ -456,3 +456,7 @@ thead {
     -moz-background-clip: padding !important;
     background-clip: padding-box !important;
 }
+
+.w-18 {
+    width: 4.5rem !important;
+}

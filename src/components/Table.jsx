@@ -2,7 +2,7 @@ import Link from "next/link";
 import Tooltip from "@mui/material/Tooltip";
 import { Fragment } from "react";
 
-const Table = ({ rows, columns, rowCount, onPageChange, page }) => {
+const Table = ({ rows, columns, rowCount, onPageChange, page, perPage }) => {
     return (
         <div className="mt-3 flow-root data-grid">
             <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -20,10 +20,13 @@ const Table = ({ rows, columns, rowCount, onPageChange, page }) => {
                                                 scope="col"
                                                 key={column}
                                                 className={
-                                                    "px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-32 overflow-ellipsis " +
+                                                    " px-3 py-3.5 text-left text-sm font-semibold text-gray-900 overflow-ellipsis " +
                                                     (columnNum == 0
                                                         ? " py-3.5 pl-4 pr-3 sm:pl-6"
-                                                        : "")
+                                                        : "") +
+                                                    (["state", "zip"].includes(column)
+                                                        ? " w-18"
+                                                        : " w-28")
                                                 }
                                             >
                                                 {column}
@@ -34,7 +37,7 @@ const Table = ({ rows, columns, rowCount, onPageChange, page }) => {
                                 {rows?.length > 0 && (
                                     <tbody
                                         className="divide-y divide-gray-200 bg-white my-0"
-                                        style={{ "max-height": "50vh" }}
+                                        style={{ maxHeight: "50vh" }}
                                     >
                                         {(rows ?? [])?.map((row, rowNum) => (
                                             <tr key={row.id}>
@@ -47,7 +50,7 @@ const Table = ({ rows, columns, rowCount, onPageChange, page }) => {
                                                         >
                                                             <td
                                                                 className={
-                                                                    "whitespace-nowrap px-3 py-3 text-sm text-gray-500 w-32 overflow-ellipsis " +
+                                                                    "whitespace-nowrap px-3 py-3 text-sm text-gray-500  overflow-ellipsis " +
                                                                     (columnNum == 0
                                                                         ? " pl-4 pr-3 sm:pl-6"
                                                                         : "") +
@@ -89,7 +92,12 @@ const Table = ({ rows, columns, rowCount, onPageChange, page }) => {
                                 </div>
                             </div>
                         )}
-                        <Pagination page={page} rowCount={rowCount} onPageChange={onPageChange} />
+                        <Pagination
+                            page={page}
+                            rowCount={rowCount}
+                            onPageChange={onPageChange}
+                            perPage={perPage}
+                        />
                     </div>
                 </div>
             </div>
@@ -97,20 +105,22 @@ const Table = ({ rows, columns, rowCount, onPageChange, page }) => {
     );
 };
 
-function Pagination({ page, rowCount, onPageChange }) {
+function Pagination({ page, rowCount, onPageChange, perPage }) {
     return (
         <div
-            className=" flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+            className=" flex items-center justify-end text-right border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
             aria-label="Pagination"
         >
-            <div className="hidden sm:block">
+            <div className="hidden sm:block text-right justify-end">
                 <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">1</span> to{" "}
-                    <span className="font-medium">10</span> of{" "}
-                    <span className="font-medium">{rowCount}</span> results
+                    Showing <span className="font-medium">{page * perPage}</span> to{" "}
+                    <span className="font-medium">
+                        {rowCount < (page + 1) * perPage ? rowCount : (page + 1) * perPage}
+                    </span>{" "}
+                    of <span className="font-medium">{rowCount}</span> results
                 </p>
             </div>
-            <div className="flex flex-1 justify-between sm:justify-end">
+            <div className="flex justify-end sm:justify-end ml-3">
                 <button
                     href="#"
                     className="btn mx-3 my-0"
@@ -118,18 +128,21 @@ function Pagination({ page, rowCount, onPageChange }) {
                     onClick={() => {
                         onPageChange(page - 1);
                     }}
+                    {...(page < 1 && { disabled: true })}
                 >
-                    Previous
+                    Previous Page
                 </button>
+
                 <button
                     href="#"
                     className="btn my-0"
                     type="button"
+                    {...(rowCount <= perPage && { disabled: true })}
                     onClick={() => {
                         onPageChange(page + 1);
                     }}
                 >
-                    Next
+                    Next Page
                 </button>
             </div>
         </div>

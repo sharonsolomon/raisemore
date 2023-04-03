@@ -69,8 +69,10 @@ export function useQuery(query) {
             throw error;
         }
 
-        if (count !== null) {
+        if (typeof count === "number") {
+            console.log({ count });
             data.count = count;
+            console.log(data.count);
         }
 
         return data;

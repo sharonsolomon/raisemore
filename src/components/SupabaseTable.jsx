@@ -31,8 +31,9 @@ export default function SupabaseTable({
     );
     if (error) console.error(error);
 
-    let rowCount = (rows?.count || 0) + 0;
-    if (rows && rows?.count) delete rows.count;
+    let rowCount = Number(rows?.count || 0);
+    console.log({ rowCount });
+    // if (rows && rows?.count) delete rows.count;
 
     return (
         <Table
@@ -41,6 +42,7 @@ export default function SupabaseTable({
             rowCount={Number(rowCount) || 0}
             onPageChange={setPage}
             page={page}
+            perPage={perPage}
         />
     );
 }
