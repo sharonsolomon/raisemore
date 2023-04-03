@@ -23,8 +23,6 @@ import {
     update,
 } from "react-querybuilder";
 
-let fields = [];
-
 const initialQuery = {
     combinator: "and",
     rules: [],
@@ -38,7 +36,11 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
     const { data: list, mutate: fetchList } = useQuery(
         listID && supabase.from("saved_lists").select().eq("id", listID).single()
     );
-    if (query == initialQuery && list?.query) setQuery(parseSQL(list.query));
+
+    // Keep the local temporary state in line with the serverside on any serverside changes
+    useEffect(() => {
+        if (list?.query) setQuery(parseSQL(list.query));
+    }, [list?.query]);
 
     var formattedQuery = formatQuery(query, {
         format: "sql",
@@ -47,18 +49,12 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
     // .replaceAll("like '%", "like '%");
     // console.log("formattedQuery", formattedQuery);
 
-    // TODO: remove /rq endpoint and use supabase directly
-    const { data: rowsForColumns, error } = useSWR(
-        `/api/rq?&query=${encodeURIComponent(`select * from ${table} where (1 = 1) limit 25`)}`,
-        fetcher
-    );
+    const { data: columns } = useQuery(supabase.rpc("columns", { tblname: table }));
 
-    if (rowsForColumns && rowsForColumns[0])
-        fields = Object.keys(rowsForColumns[0]).map((a) => ({
-            name: a,
-            label: a,
-        }));
-    else fields = [];
+    const fields = columns?.map((a) => ({
+        name: a,
+        label: a,
+    }));
 
     // add a filter rule
     const addRule = useCallback(() => {
@@ -125,7 +121,12 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
                     />
                 </QueryBuilderBootstrap>
             </div>
-            <SupabaseTable table={table} currentQuery={formattedQuery} queryObj={query} />
+            <SupabaseTable
+                table={table}
+                columns={columns}
+                currentQuery={formattedQuery}
+                queryObj={query}
+            />
         </>
     );
 }

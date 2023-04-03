@@ -18,6 +18,10 @@ body {
     @apply inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
     @apply my-3;
 }
+table .btn,
+.data-grid .btn {
+    @apply my-0;
+}
 
 main {
     @apply mx-10 my-2 mr-12;
@@ -48,7 +52,7 @@ h3 {
 }
 
 .qbp .btn {
-    @apply mr-2 my-1;
+    @apply mr-2 my-1 text-xs text-gray-500 !important;
 }
 
 code {
@@ -277,10 +281,12 @@ nav .border-t {
     @apply border-r-gray-100;
 } */
 .link,
-table a {
+table a,
+.data-grid a {
     @apply text-blue-600 underline;
 }
-table a {
+table a,
+.data-grid a {
     @apply no-underline border-b text-blue-400 border-b-blue-300;
 }
 .shaded-page-header {
@@ -394,15 +400,19 @@ button[type].unstyled-button {
     @apply top-0.5;
 }
 .page-title-descriptor {
-    @apply mb-6;
+    /* @apply mb-6; */
 }
 
-main button:not(.unstyled-button) {
-    @apply shadow-lg !important;
+main button[type]:not(.do-not-global-style):not(.unstyled-button) {
+    @apply shadow-md;
+}
+main button[type]:not(.do-not-global-style):not(.unstyled-button):hover {
+    @apply shadow-lg;
 }
 main button.button-xs:not(.unstyled-button),
 main button.button-sm:not(.unstyled-button),
-main table button {
+main table button,
+main .data-grid button {
     @apply shadow-sm !important;
 }
 
@@ -436,4 +446,17 @@ main table button {
 
 h2 {
     /* @apply font-semibold !important; */
+}
+
+div,
+table,
+thead {
+    /* Prevent background color leak outs */
+    -webkit-background-clip: padding-box !important;
+    -moz-background-clip: padding !important;
+    background-clip: padding-box !important;
+}
+
+.w-18 {
+    width: 4.5rem !important;
 }

@@ -1,12 +1,12 @@
-export const compilePostgrestQuery = ({
-    currentQuery,
-    supabase,
-    table,
-    page,
-    perPage,
-    select = "*",
-}) => {
-    let queryWithFilters = supabase.from(table).select(select, { count: "estimated", head: false });
+export const compilePostgrestQuery = ({ currentQuery, supabase, table, page, perPage }) => {
+    let tableSplit = table.split(",")[0];
+    // the rest
+    let rightSplit = table.split(",").slice(1).join(",");
+    let select = "*" + (table.indexOf(",") !== -1 ? "," + rightSplit : "");
+
+    let queryWithFilters = supabase
+        .from(table.split(",")[0])
+        .select(select, { count: "estimated", head: false });
 
     const convert_sql_operators_to_postgrest = {
         // sql: "postgrest",
@@ -57,7 +57,9 @@ export const compilePostgrestQuery = ({
         );
     });
 
-    queryWithFilters = queryWithFilters.range(page * perPage, (page + 1) * perPage - 1);
+    if (typeof perPage !== "undefined") {
+        queryWithFilters = queryWithFilters.range(page * perPage, (page + 1) * perPage - 1);
+    }
 
     return queryWithFilters;
 };

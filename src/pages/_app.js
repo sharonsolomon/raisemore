@@ -27,20 +27,19 @@ function App({ Component, pageProps }) {
             <Head>
                 {[
                     "https://vitals.vercel-insights.com",
-                    // "https://clerk.prompt.meerkat-85.lcl.dev",
+                    "https://clerk.prompt.meerkat-85.lcl.dev",
                     "https://app.papercups.io",
-                    // "https://clerk.raisemore.app",
+                    "https://clerk.raisemore.app",
                 ].map((url) => (
                     <Fragment key={url}>
                         <link rel="dns-prefetch" href={url} />
                         <link rel="preconnect" href={url} crossOrigin="true" />
                     </Fragment>
                 ))}
-                <style jsx global>
-                    {globalCSS}
-                </style>
             </Head>
-
+            <style jsx global>
+                {globalCSS}
+            </style>
             <SWRConfig value={optionsSWR}>
                 <ClerkProvider {...pageProps}>
                     <SupabaseWrapper>

@@ -11,6 +11,8 @@ import Breadcrumbs from "components/Layout/Breadcrumbs";
 import PersonProfile from "components/PersonProfile/PersonProfile";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
+import { parseSQL } from "react-querybuilder";
+import { compilePostgrestQuery } from "lib/compilePostgrestQuery";
 
 export const CallSessionContext = createContext({
     personID: null,
@@ -58,21 +60,27 @@ export default function CallSessionPage() {
     const [dialedInFrom, setDialedInFrom] = useState(null);
 
     const { data: session, mutate: mutateSession } = useQuery(
-        useSupabase()
+        supabase
             .from("call_sessions")
             .select("*, saved_lists (*), call_session_participants (*), interactions (*)")
             .eq("id", callSessionID)
             .single()
     );
-    // TODO: remove /rq endpoint and use supabase directly
-    const { data: peopleResponse } = useSWR(
-        session?.saved_lists?.query
-            ? `/api/rq?query=${encodeURIComponent(
-                  `select id from people where ${session.saved_lists.query} ORDER BY inserted_at`
-              )}`
-            : null
+
+    let {
+        data: peopleResponse,
+        error,
+        // mutate,
+    } = useQuery(
+        compilePostgrestQuery({
+            currentQuery: parseSQL(session?.saved_lists?.query),
+            supabase,
+            table: "people_for_user_display",
+        })
     );
+    if (error) console.error(error);
     const peopleList = Array.from(peopleResponse?.map((row) => row.id) ?? []);
+    console.log({ peopleList });
 
     const me =
         session?.call_session_participants?.filter(
