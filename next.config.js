@@ -49,6 +49,24 @@ const nextConfig = {
             },
         ],
     },
+    // basePath: "/app",
+    async redirects() {
+        return [
+            {
+                source: "/",
+                permanent: false,
+                missing: [
+                    {
+                        type: "cookie",
+                        key: "__session",
+                        // value: "*",
+                    },
+                ],
+                destination: "https://join.raisemore.app/",
+                basePath: false,
+            },
+        ];
+    },
     async headers() {
         return [
             {
