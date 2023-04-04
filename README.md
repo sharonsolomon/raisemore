@@ -2,6 +2,12 @@
 
 ### Live at [www.raisemore.app](https://www.raisemore.app)
 
+![](public/ss-1.png?raw=true)
+
+![](public/ss-7.png?raw=true)
+
+![](public/ss-6.png?raw=true)
+
 ## A database and phone dialer for political fundraising:
 
 -   Syncs with Actblue.
@@ -17,5 +23,3 @@
 -   Built with Next.js and Postgres.
 -   Automated testing with Playwright and Checkly.
 -   Client side monitoring with Sentry.
-
-![](public/screenshot.png?raw=true)
