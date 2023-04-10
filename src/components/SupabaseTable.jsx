@@ -32,7 +32,7 @@ export default function SupabaseTable({
 
     let rowCount = Number(rows?.count || 0);
     console.log({ rowCount });
-    if (rows && rows?.count) delete rows.count;
+    // if (rows && rows?.count) delete rows.count;
 
     let { data: columns } = useQuery(supabase.rpc("columns", { tblname: table }));
 
