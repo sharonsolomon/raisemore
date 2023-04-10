@@ -335,8 +335,6 @@ export async function processDonations({
         })
     );
 
-    // console.log({ peopleToUpsert });
-
     const peopleInsertResults = await supabase
         .from("people")
         .upsert(peopleToUpsert, { ignoreDuplicates: false })

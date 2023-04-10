@@ -1,6 +1,9 @@
 .DEFAULT_GOAL := reset
 
-reset: stop start dev
+reset: dockerfix stop start dev
+
+dockerfix:
+	sudo ln -s ~/.docker/run/docker.sock /var/run/docker.sock || true
 
 start:
 	supabase start --exclude gotrue,imgproxy,pgadmin-schema-diff,migra,deno-relay,inbucket
