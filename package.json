@@ -18,7 +18,7 @@
         "analyze": "ANALYZE=true npm run build"
     },
     "dependencies": {
-        "@clerk/nextjs": "^4.14.0",
+        "@clerk/nextjs": "4.14.0",
         "@emotion/react": "^11.10.5",
         "@emotion/styled": "^11.10.5",
         "@headlessui/react": "^1.7.5",
