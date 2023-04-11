@@ -3,10 +3,35 @@ import { useRouter } from "next/router";
 import { useQuery, useSupabase } from "lib/supabaseHooks";
 import Table from "components/Table";
 import { compilePostgrestQuery } from "lib/compilePostgrestQuery";
+import { ObjectType } from "@clerk/nextjs/dist/api";
+
+const flatten = (rows) => {
+    if (!rows) return [];
+    return rows.map((row) => {
+        let newRow = {};
+        for (let [key, value] of Object.entries(row)) {
+            if (typeof value === "object") {
+                if (!value) newRow[key] = value;
+                else if (Array.isArray(value)) {
+                    for (let [subkey, subvalue] of Object.entries(value[0])) {
+                        newRow[key + "_" + subkey] = subvalue;
+                    }
+                } else if (Object.keys(value).length > 0) {
+                    for (let [subkey, subvalue] of Object.entries(value ?? {})) {
+                        newRow[key + "_" + subkey] = subvalue;
+                    }
+                }
+            } else {
+                newRow[key] = value;
+            }
+        }
+        return newRow;
+    });
+};
 
 export default function SupabaseTable({
     table,
-    query = "*",
+    select = "*",
     currentQuery,
     queryObj,
     setFilterColumns = () => {},
@@ -15,27 +40,29 @@ export default function SupabaseTable({
     let perPage = 10;
 
     const supabase = useSupabase();
-    let {
-        data: rows,
-        error,
-        mutate,
-    } = useQuery(
+    let { data, error, mutate } = useQuery(
         compilePostgrestQuery({
             currentQuery: queryObj,
             supabase,
             table,
             page,
             perPage,
+            select,
         })
     );
     if (error) console.error(error);
+    let rows = flatten(data);
 
     let rowCount = Number(rows?.count || 0);
-    console.log({ rowCount });
-    if (rows && rows?.count) delete rows.count;
+    // if (rows && rows?.count) delete rows.count; // This line breaks subsequent SWR loads from having count
 
     let { data: columns } = useQuery(supabase.rpc("columns", { tblname: table }));
-
+    if (select !== "*") {
+        columns = [...select.split(",")];
+    }
+    if (rows?.length) {
+        columns = Object.keys(rows[0]);
+    }
     if (table === "saved_lists" && columns && rows?.length) {
         // columns?.push("Edit query");
         // columns?.push("New call session");

@@ -7,14 +7,14 @@ function classNames(...classes) {
 
 function DispositionOptions({ disposition, setDisposition }) {
     const dispositions = [
-        "Pledged!",
+        "Donated",
+        "Pledged",
         "No pledge",
         "Not home",
-        "Call back",
-        "Wrong number / disconnected",
-        "Left message",
+        "Call me back later",
+        "Wrong number",
+        "Disconnected",
         "Refused / remove",
-        "Hostile",
     ];
     return (
         <div>
@@ -78,7 +78,7 @@ export default function AddInteractionCard({ person, appendInteraction }) {
                 </div> */}
                 <div className="min-w-0 flex-1">
                     <form action="#" className="relative">
-                        {(outbound || needsLogToAdvance) && (
+                        {(true || outbound || needsLogToAdvance) && (
                             <DispositionOptions
                                 disposition={disposition}
                                 setDisposition={setDisposition}

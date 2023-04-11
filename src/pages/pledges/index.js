@@ -32,7 +32,10 @@ export default function Dashboard() {
                 </div>
             </div>
             <div className="mx-auto max-w-7xl px-2">
-                <SupabaseTable table="pledges" />
+                <SupabaseTable
+                    table="pledges"
+                    select="people (first_name, last_name), created_at, amount, fufilled"
+                />
             </div>
         </div>
     );

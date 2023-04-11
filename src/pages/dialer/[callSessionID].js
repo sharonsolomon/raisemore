@@ -382,7 +382,7 @@ export default function CallSessionPage() {
                                         {process.env.NEXT_PUBLIC_DIALER_NUMBER}
                                     </p>
                                     <p className="mt-2 inline-block text-base font-normal text-blue-700">
-                                        Call this number with your phone to connect to the dialer.
+                                        Call with your phone to connect to the dialer.
                                     </p>
                                     {/* <p className="mt-2 inline-block text-base text-gray-300 italic">
                                             You should be calling in from {dialedInFrom}
