@@ -23,7 +23,7 @@ export default function Dashboard() {
             <div className="mx-auto max-w-7xl px-2  ">
                 <SupabaseTable
                     table="interactions"
-                    // select="created_at, person_id, "
+                    select="people (first_name, last_name), created_at, contact_type, disposition, note"
                 />
             </div>
         </div>

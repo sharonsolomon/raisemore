@@ -28,7 +28,13 @@ const initialQuery = {
     rules: [],
 };
 
-export default function QueryBuilderProvider({ table, children, listID, forceListUpdate }) {
+export default function QueryBuilderProvider({
+    table,
+    children,
+    listID,
+    forceListUpdate,
+    select = "*",
+}) {
     const supabase = useSupabase();
     const router = useRouter();
     const [query, setQuery] = useState(initialQuery);
@@ -126,6 +132,7 @@ export default function QueryBuilderProvider({ table, children, listID, forceLis
                 columns={columns}
                 currentQuery={formattedQuery}
                 queryObj={query}
+                select={select}
             />
         </>
     );
