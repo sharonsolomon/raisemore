@@ -17,7 +17,7 @@ export default function Dashboard() {
                 />
             </div>
             <div className="mx-auto max-w-7xl px-2">
-                <SupabaseTable table="saved_lists" />
+                <SupabaseTable table="saved_lists" select="created_at, name, query, id" />
             </div>
         </div>
     );
