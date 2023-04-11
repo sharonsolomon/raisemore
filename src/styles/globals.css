@@ -110,7 +110,15 @@ pre {
 }
 
 .cl-card {
-    @apply ring-1 ring-black ring-opacity-10 shadow-lg;
+    @apply ring-1 ring-black ring-opacity-10 shadow-lg !important;
+}
+
+.cl-createOrganization-root {
+    @apply mt-20 mx-auto;
+}
+
+.cl-formField__slug {
+    @apply hidden;
 }
 
 .cl-main {
