@@ -52,7 +52,7 @@ const navigation = [
     },
     { name: "Make Calls", href: "/dialer", icon: PhoneIcon, current: false },
     {
-        name: "Interaction History",
+        name: "Call History",
         href: "/contacthistory",
         icon: ClockIcon,
         current: false,

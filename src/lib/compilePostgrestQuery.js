@@ -1,8 +1,15 @@
-export const compilePostgrestQuery = ({ currentQuery, supabase, table, page, perPage }) => {
+export const compilePostgrestQuery = ({
+    currentQuery,
+    supabase,
+    table,
+    page,
+    perPage,
+    select = "*",
+}) => {
     let tableSplit = table.split(",")[0];
     // the rest
     let rightSplit = table.split(",").slice(1).join(",");
-    let select = "*" + (table.indexOf(",") !== -1 ? "," + rightSplit : "");
+    // let select = "*" + (table.indexOf(",") !== -1 ? "," + rightSplit : "");
 
     let queryWithFilters = supabase
         .from(table.split(",")[0])

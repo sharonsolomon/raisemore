@@ -135,7 +135,7 @@ export default function SyncPage() {
                     descriptor={
                         <>
                             Configure automatic continuous imports from ActBlue.{" "}
-                            <Link className="link" href="/help/sync">
+                            <Link className="link" href="http://docs.raisemore.com/sync">
                                 Learn more.
                             </Link>
                         </>

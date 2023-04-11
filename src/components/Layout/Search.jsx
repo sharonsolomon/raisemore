@@ -38,15 +38,43 @@ function SearchModal({ setOpen, open = false }) {
     const [query, setQuery] = useState("");
     const router = useRouter();
 
-    const { data } = useQuery(useSupabase()?.rpc("search", { query }).limit(25));
-    const people = data?.map(({ id, first_name, last_name }) => ({
+    const supabase = useSupabase();
+
+    const { data: peopleResults } = useQuery(supabase?.rpc("search", { query }).limit(5));
+    const people = peopleResults?.map(({ id, first_name, last_name }) => ({
         id,
         name: first_name + " " + last_name,
         category: "People",
         url: "/people/" + id,
     }));
 
-    const filteredItems = query !== "" && !Array.isArray(people) ? [] : people;
+    const { data: noteResults } = useQuery(supabase?.rpc("search_notes", { query }).limit(5));
+    const notes = noteResults?.map(
+        ({ id, note, person_id, created_at, first_name, last_name }) => ({
+            id,
+            // name: first_name + " " + last_name,
+            name:
+                "..." +
+                note +
+                "... | " +
+                first_name +
+                " " +
+                last_name +
+                " | " +
+                new Date(created_at).toLocaleDateString([], {
+                    month: "short",
+                    day: "numeric",
+                    year: "2-digit",
+                }),
+            category: "Notes",
+            url: "/people/" + person_id,
+        })
+    );
+
+    const filteredItems = [
+        ...(Array.isArray(people) ? people : []),
+        ...(Array.isArray(notes) ? notes : []),
+    ];
 
     const groups = filteredItems?.reduce((groups, item) => {
         return { ...groups, [item.category]: [...(groups[item.category] || []), item] };
@@ -105,17 +133,16 @@ function SearchModal({ setOpen, open = false }) {
                                         <p className="mt-1 font-semibold text-gray-700">
                                             Quick search
                                         </p>
-                                        <p className="mt-1 text-gray-400">
-                                            all donors by name (coming later: lists, notes, pledges,
-                                            etc...)
-                                        </p>
                                     </div>
                                 )}
 
                                 {filteredItems?.length > 0 && (
                                     <Combobox.Options
                                         static
-                                        className="max-h-80 scroll-pt-11 scroll-pb-2 space-y-2 overflow-y-auto pb-2"
+                                        className={
+                                            "max-h-80 scroll-pt-11 scroll-pb-2 space-y-2 overflow-y-auto pb-2 " +
+                                            (query === "" ? " max-h-80" : " max-h-full")
+                                        }
                                     >
                                         {Object.entries(groups).map(([category, items]) => (
                                             <li key={category}>

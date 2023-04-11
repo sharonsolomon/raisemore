@@ -6,7 +6,7 @@ import { compilePostgrestQuery } from "lib/compilePostgrestQuery";
 
 export default function SupabaseTable({
     table,
-    query = "*",
+    select = "*",
     currentQuery,
     queryObj,
     setFilterColumns = () => {},
@@ -26,16 +26,19 @@ export default function SupabaseTable({
             table,
             page,
             perPage,
+            select,
         })
     );
     if (error) console.error(error);
 
     let rowCount = Number(rows?.count || 0);
     console.log({ rowCount });
-    // if (rows && rows?.count) delete rows.count;
+    // if (rows && rows?.count) delete rows.count; // This line breaks subsequent SWR loads from having count
 
     let { data: columns } = useQuery(supabase.rpc("columns", { tblname: table }));
-
+    if (select !== "*") {
+        columns = [...select.split(",")];
+    }
     if (table === "saved_lists" && columns && rows?.length) {
         // columns?.push("Edit query");
         // columns?.push("New call session");
