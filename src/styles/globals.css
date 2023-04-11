@@ -93,7 +93,7 @@ pre {
 .cl-internal-b3fm6y,
 .cl-organizationSwitcherPopoverFooter,
 .cl-internal-1w7h4oz,
-.cl-signUp-start div:last-child {
+.cl-signUp-start > div:last-child {
     display: none !important;
 }
 
@@ -102,7 +102,11 @@ pre {
 }
 
 .cl-rootBox .cl-signUp-start {
-    @apply shadow-lg mt-12 !important;
+    @apply shadow-lg mt-5 !important;
+}
+
+.cl-signUp-start input {
+    @apply border-gray-300;
 }
 
 .cl-card {
