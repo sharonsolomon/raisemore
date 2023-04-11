@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-export const config = { runtime: "edge" };
+// export const config = { runtime: "edge" }; // Lets use node
 import { getAuth } from "@clerk/nextjs/server";
 const { v4: uuid } = require("uuid");
 const Papa = require("papaparse"); // Handles csvs
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { EMAIL_VALIDATION_REGEX } from "lib/validation";
 import { ObjectType } from "@clerk/nextjs/dist/api";
+import { useRouter } from "next/router";
 // List of columns in order from csv file
 let permitTheseColumns = [
     "person_id",
@@ -102,8 +103,9 @@ let permitTheseColumns = [
 
 // Load csv of donations to donation and people table
 export default async function loadDonationsCSV(req, res) {
-    const { searchParams } = new URL(req.url);
-    let fileName = searchParams.get("fileName");
+    // const { searchParams } = new URL(req.url); // Edge runtime
+    // let fileName = searchParams.get("fileName");
+    const { fileName } = req.query; // Node runtime
 
     // Clerk
     const { orgId: orgID, getToken, userId: userID } = getAuth(req);
@@ -154,10 +156,7 @@ export default async function loadDonationsCSV(req, res) {
         .upsert([{ id: batchID, finalized: new Date().toISOString() }]);
     console.timeEnd("functionexectime");
 
-    // res.send(`File uploaded successfully, and ${fileParsedToJSON.length} records processed.`);
-    return new Response(
-        `File uploaded successfully, and ${fileParsedToJSON.length} records processed.`
-    );
+    res.send(`File uploaded successfully, and ${fileParsedToJSON.length} records processed.`);
 }
 
 async function loadFile({ fileName, supabaseServiceRole }) {
