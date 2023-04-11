@@ -58,8 +58,21 @@ const nextConfig = {
                 missing: [
                     {
                         type: "cookie",
-                        key: "__session",
+                        key: "__client_uat",
                         // value: "*",
+                    },
+                ],
+                destination: "https://join.raisemore.app/",
+                basePath: false,
+            },
+            {
+                source: "/",
+                permanent: false,
+                has: [
+                    {
+                        type: "cookie",
+                        key: "__client_uat",
+                        value: "0",
                     },
                 ],
                 destination: "https://join.raisemore.app/",
