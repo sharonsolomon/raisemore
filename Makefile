@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := reset
 
-reset: dockerfix stop start dev
+reset: stop start dev
 
 dockerfix:
 	sudo ln -s ~/.docker/run/docker.sock /var/run/docker.sock || true
