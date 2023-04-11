@@ -206,11 +206,15 @@ export async function processDonations({
 }) {
     // Grab the people collection as an array of rows
     console.time("people query");
-    const { data: people } = await supabaseServiceRole
+    const { data: people, error: peopleGetError } = await supabaseServiceRole
         .from("people")
         .select("*, emails (*), phone_numbers(*)")
         .eq("organization_id", orgID);
     console.timeEnd("people query");
+    if (peopleGetError) {
+        console.error(peopleGetError);
+        return NextResponse.json(peopleGetError, { status: 400 });
+    }
     console.time("edit file");
 
     // Hashmap by email and fullname
@@ -425,22 +429,22 @@ function newPersonFromDonationObject(donation = {}) {
     const phones = phoneFields?.map((phoneField) => cleanPhone(donation[phoneField]));
     return {
         // Basic assignments
-        last_name: donation?.donor_last_name?.trim(),
-        first_name: donation?.donor_first_name?.trim(),
-        email: donation?.donor_email?.trim(),
-        phones,
-        employer: donation?.donor_employer?.trim(),
-        occupation: donation?.donor_occupation?.trim(),
-        bio: donation?.bio?.trim(),
-        tags: donation?.tags?.trim(),
+        last_name: donation?.donor_last_name ?? null,
+        first_name: donation?.donor_first_name ?? null,
+        email: donation?.donor_email ?? null,
+        phones: phones ?? [],
+        employer: donation?.donor_employer ?? null,
+        occupation: donation?.donor_occupation ?? null,
+        bio: donation?.bio ?? null,
+        tags: donation?.tags ?? null,
 
         // Address
-        addr1: donation?.donor_addr1?.trim(),
-        addr2: donation?.donor_addr2?.trim(),
-        city: donation?.donor_city?.trim(),
-        state: donation?.donor_state?.trim(),
-        country: donation?.donor_country?.trim(),
-        zip: donation?.donor_zip?.trim(),
+        addr1: donation?.donor_addr1 ?? null,
+        addr2: donation?.donor_addr2 ?? null,
+        city: donation?.donor_city ?? null,
+        state: donation?.donor_state ?? null,
+        country: donation?.donor_country ?? null,
+        zip: donation?.donor_zip ?? null,
     };
 }
 

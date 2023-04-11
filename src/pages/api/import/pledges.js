@@ -1,7 +1,7 @@
 // Switching to pledges over prospects to mirror the pledge=donation
 // relational structure of the other import code
 // TODO: refactor both files together to separate concerns/repetitive code
-
+import { NextResponse } from "next/server";
 export const config = { runtime: "edge" };
 import { getAuth } from "@clerk/nextjs/server";
 const { v4: uuid } = require("uuid");
@@ -36,13 +36,13 @@ function newPersonFromPledgeObject(data = {}) {
     );
     const phones = phoneFields?.map((phoneField) => cleanPhone(data[phoneField]));
     const normalized = {
-        first_name: data?.first_name,
-        last_name: data?.last_name,
-        zip: data?.zip,
-        email: data?.email,
-        phones,
-        bio: data?.bio,
-        tags: data?.tags,
+        first_name: data?.first_name ?? null,
+        last_name: data?.last_name ?? null,
+        zip: data?.zip ?? null,
+        email: data?.email ?? null,
+        phones: phones ?? [],
+        bio: data?.bio ?? null,
+        tags: data?.tags ?? null,
     };
     return normalized;
 }
@@ -114,12 +114,20 @@ export default async function loadPledgesCSV(req, res) {
     // fileParsedToJSON = stripKeys(fileParsedToJSON, permitTheseColumns);
 
     // Grab the people collection as an array of rows
+    // const { data: dataa } = await supabaseServiceRole.rpc("whoami");
+    // console.log({ dataa });
+    // const { data: timeout } = await supabaseServiceRole.rpc("timeout");
+    // console.log({ timeout });
     console.time("people query");
-    const { data: people } = await supabaseServiceRole
+    const { data: people, error: peopleGetError } = await supabaseServiceRole
         .from("people")
         .select("*, emails (*), phone_numbers(*)")
         .eq("organization_id", orgID);
     console.timeEnd("people query");
+    if (peopleGetError) {
+        console.error(peopleGetError);
+        return NextResponse.json(peopleGetError, { status: 400 });
+    }
 
     // Hashmap by email and fullname
     const hashByEmail = new Map();
@@ -142,7 +150,7 @@ export default async function loadPledgesCSV(req, res) {
         const pledge = fileParsedToJSON[index];
 
         // Create an object to hold new information, desctructre to remove the email and phone
-        const { tags, bio, email, phones, ...newPerson } = {
+        const { tags, email, phones, ...newPerson } = {
             ...newPersonFromPledgeObject(pledge),
             batch_id: batchID,
             organization_id: orgID,
@@ -241,6 +249,8 @@ export default async function loadPledgesCSV(req, res) {
             batch_id: null,
         })
     );
+
+    console.log(peopleToUpsert);
 
     const peopleInsertResults = await supabase
         .from("people")
