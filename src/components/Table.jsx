@@ -62,6 +62,8 @@ const Table = ({ rows, columns, rowCount, onPageChange, page, perPage }) => {
                                                                 {[
                                                                     "first_name",
                                                                     "last_name",
+                                                                    "people_first_name",
+                                                                    "people_last_name",
                                                                 ].includes(columnName) ? (
                                                                     <Link
                                                                         href={`/people/${row.id}`}
