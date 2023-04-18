@@ -79,3 +79,11 @@ next.config.wizardcopy.js
 .swc
 
 *.icloud
+# Sentry
+.sentryclirc
+
+# Sentry
+next.config.original.js
+
+# Sentry
+next.config.wizardcopy.js
