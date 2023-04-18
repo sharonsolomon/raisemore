@@ -6,7 +6,17 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("PRISMA_DATABASE_URL")
-  extensions = [pg_trgm]
+  extensions = [pg_trgm, uuid_ossp(map: "uuid-ossp", schema: "extensions")]
+}
+
+model caller_ids {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  inserted_at     DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime? @db.Timestamptz(6)
+  phone_number    BigInt
+  twilio_sid      String?
+  organization_id String    @unique @default(dbgenerated("requesting_org_id()"))
 }
 
 model call_sessions {
@@ -384,27 +394,21 @@ view donations_rollup_by_person {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 view people_for_user_display {
-  id                        String?   @db.Uuid
-  created_at                DateTime? @db.Timestamptz(6)
-  first_name                String?
-  last_name                 String?
-  addr1                     String?
-  addr2                     String?
-  city                      String?
-  state                     String?
-  zip                       String?
-  country                   String?
-  occupation                String?
-  employer                  String?
-  total_donated             Decimal?  @db.Decimal
-  number_of_donations       BigInt?
-  most_recent_donation      String?
-  concatenated_zip_and_name String?
-  donations_made_in_2020    BigInt?
-  total_donated_2020        BigInt?
-  list_of_committees_2020   String?
-  number_of_committees_2020 BigInt?
-  organization_id           String?
+  first_name           String?
+  last_name            String?
+  addr1                String?
+  city                 String?
+  state                String?
+  zip                  String?
+  occupation           String?
+  employer             String?
+  largest_donation     Decimal? @db.Decimal
+  total_donated        Decimal? @db.Decimal
+  number_of_donations  BigInt?
+  most_recent_donation String?
+  tags                 String?
+  pledges_unfulfilled  Decimal? @db.Decimal
+  id                   String?  @db.Uuid
 
   @@ignore
 }

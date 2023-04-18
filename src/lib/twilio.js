@@ -8,23 +8,23 @@ export const TWILIO_API_URL = `https://api.twilio.com/2010-04-01/Accounts/${proc
 export const encodedBodyToJSON = (urlEncoded) =>
     Object.fromEntries(new URLSearchParams(urlEncoded));
 
-export async function getConferences() {
-    /*
-    // const conferences = await client.conferences.list({
-    //     status: "in-progress",
-    //     limit: 1,
-    // });
-    //
-    // curl -X GET "https://api.twilio.com/2010-04-01/Accounts/$TWILIO_ACCOUNT_SID/Conferences.json?DateCreated%3E=2021-01-01&Status=in-progress&PageSize=20" \
-    // -u $TWILIO_ACCOUNT_SID:$TWILIO_AUTH_TOKEN
-    */
-    // Reformatted as edge-compatible HTTP:
-    const response = await (
-        await fetch(`${TWILIO_API_URL}/Conferences.json?Status=in-progress&PageSize=1`, {
-            headers: new Headers({
-                ...Authorization,
-            }),
-        })
-    ).json();
-    return response?.conferences || [];
-}
+// export async function getConferences() {
+//     /*
+//     // const conferences = await client.conferences.list({
+//     //     status: "in-progress",
+//     //     limit: 1,
+//     // });
+//     //
+//     // curl -X GET "https://api.twilio.com/2010-04-01/Accounts/$TWILIO_ACCOUNT_SID/Conferences.json?DateCreated%3E=2021-01-01&Status=in-progress&PageSize=20" \
+//     // -u $TWILIO_ACCOUNT_SID:$TWILIO_AUTH_TOKEN
+//     */
+//     // Reformatted as edge-compatible HTTP:
+//     const response = await (
+//         await fetch(`${TWILIO_API_URL}/Conferences.json?Status=in-progress&PageSize=1`, {
+//             headers: new Headers({
+//                 ...Authorization,
+//             }),
+//         })
+//     ).json();
+//     return response?.conferences || [];
+// }
