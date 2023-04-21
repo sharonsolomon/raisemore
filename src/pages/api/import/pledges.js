@@ -8,7 +8,8 @@ const { v4: uuid } = require("uuid");
 const Papa = require("papaparse"); // Handles csvs
 import { createSupabaseClient } from "lib/supabaseHooks";
 import { EMAIL_VALIDATION_REGEX } from "lib/validation";
-import { cleanPhone, stripKeys } from "./donations";
+import { stripKeys } from "./donations";
+import { cleanPhone } from "lib/validation";
 import { useRouter } from "next/router";
 
 // List of columns in order from csv file
