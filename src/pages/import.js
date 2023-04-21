@@ -161,7 +161,10 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
                 <div className="">
                     <div className="mx-auto max-w-7xl px-2 ">
                         <h2 className="mt-8 mb-0">Upload a prospect file for donor research:</h2>
-                        <p className="font-light">(required: first_name, last_name, and zip) </p>
+                        <p className="font-light">
+                            (required: first_name, last_name, and phone; other fields: zip, email,
+                            bio, tags (comma seperated)){" "}
+                        </p>
                         <div className="md:grid md:grid-cols-2">
                             <div className="col-span-1">
                                 <FilePond
