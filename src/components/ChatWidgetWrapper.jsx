@@ -34,7 +34,7 @@ export default function ChatWidgetWrapper() {
     agentUnavailableText: "We're away at the moment.",
     requireEmailUpfront: false,
     iconVariant: "outlined",
-    baseUrl: "https://app.papercups.io"
+    baseUrl: "https://app.papercups.io",
     // Optionally include data about your customer here to identify them
     customer: {
       name: customer?.name,
