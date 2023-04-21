@@ -303,7 +303,7 @@ const importChoices = [
     {
         id: 2,
         title: "Prospects",
-        description: "Use any spreadsheet with first_name, last_name, and zip",
+        description: "Use any spreadsheet with first_name, last_name, and phone",
         users: "1200 users",
     },
     {
