@@ -4,7 +4,7 @@ import Script from "next/script";
 export default function ChatWidgetWrapper() {
     const { isLoaded, isSignedIn, user } = useUser();
 
-    let customer = null;
+    let customer = {};
     if (isSignedIn)
         customer = {
             name: user?.fullName,
@@ -36,13 +36,17 @@ export default function ChatWidgetWrapper() {
     iconVariant: "outlined",
     baseUrl: "https://app.papercups.io",
     // Optionally include data about your customer here to identify them
-    customer: {
-      name: customer?.name,
-      email: customer?.email,
-      external_id: customer?.id,
+    ${
+        !!customer
+            ? `customer: {
+      name: ${customer?.name},
+      email: ${customer?.email},
+      external_id: ${customer?.id},
     //   metadata: {
     //     plan: "premium"
-      }
+      }`
+            : ""
+    }
     // }
   },
 };`}
