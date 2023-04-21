@@ -38,7 +38,7 @@ export default function ChatWidgetWrapper() {
     // Optionally include data about your customer here to identify them
     customer: {
       name: customer?.name,
-      email: customer.email,
+      email: customer?.email,
       external_id: customer?.id,
     //   metadata: {
     //     plan: "premium"
