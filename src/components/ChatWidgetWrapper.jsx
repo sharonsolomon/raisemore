@@ -4,7 +4,7 @@ import Script from "next/script";
 export default function ChatWidgetWrapper() {
     const { isLoaded, isSignedIn, user } = useUser();
 
-    let customer = {};
+    let customer = null;
     if (isSignedIn)
         customer = {
             name: user?.fullName,
