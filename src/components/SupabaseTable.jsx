@@ -53,7 +53,7 @@ export default function SupabaseTable({
     if (error) console.error(error);
     let rows = flatten(data);
 
-    let rowCount = Number(rows?.count || 0);
+    let rowCount = Number(data?.count || 0);
     // if (rows && rows?.count) delete rows.count; // This line breaks subsequent SWR loads from having count
 
     let { data: columns } = useQuery(supabase.rpc("columns", { tblname: table }));

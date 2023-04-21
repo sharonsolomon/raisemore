@@ -1,4 +1,4 @@
-// const { withSentryConfig } = require("@sentry/nextjs");
+const { withSentryConfig } = require("@sentry/nextjs");
 
 const securityHeaders = [
     {
@@ -94,7 +94,7 @@ const nextConfig = {
 module.exports = nextConfig;
 
 // Sentry
-// module.exports = withSentryConfig(module.exports, { silent: true }, { hideSourcemaps: true });
+module.exports = withSentryConfig(module.exports, { silent: true }, { hideSourcemaps: true });
 
 // Next bundle analyzer
 // const withBundleAnalyzer = require("@next/bundle-analyzer")({

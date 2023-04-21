@@ -1,3 +1,4 @@
+import { getAuth } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
 import { createContext, useContext } from "react";
 import useSWR from "swr";
@@ -82,4 +83,19 @@ export function useQuery(query) {
             : query?.url?.href;
 
     return useSWR(() => key, fetcher);
+}
+
+export async function createAuthorizedSupabase(req) {
+    const { orgId: orgID, getToken, userId: userID } = getAuth(req);
+    if (!orgID) return { error: 401 };
+
+    const supabase = createSupabaseClient(
+        await getToken({
+            template:
+                process.env.NEXT_PUBLIC_ENVIRONMENT != "development"
+                    ? "supabase"
+                    : "supabase-local-development",
+        })
+    );
+    return { supabase, orgID, userID };
 }

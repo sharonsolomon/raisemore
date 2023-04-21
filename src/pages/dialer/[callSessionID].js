@@ -275,21 +275,24 @@ export default function CallSessionPage() {
 
     async function hangup() {
         return await fetch(
-            `/api/dialer/hangup?conferenceSID=${encodeURIComponent(
-                conferenceSID
-            )}&participant=${encodeURIComponent(`outboundCall|${session.current_person_id}`)}`
+            `/api/dialer/hangup?` +
+                new URLSearchParams({
+                    conferenceSID,
+                    participant: `outboundCall|${session.current_person_id}`,
+                }).toString()
         );
     }
 
     async function dial(number) {
         return await (
             await fetch(
-                "/api/dialer/dialOut?numberToDial=" +
-                    encodeURIComponent(number.toString()) +
-                    "&conferenceSID=" +
-                    encodeURIComponent(conferenceSID) +
-                    "&personID=" +
-                    encodeURIComponent(session.current_person_id)
+                "/api/dialer/dialOut?" +
+                    new URLSearchParams({
+                        numberToDial: number.toString(),
+                        conferenceSID,
+                        personID: session.current_person_id,
+                        callerID,
+                    }).toString()
             )
         ).json();
     }

@@ -1,11 +1,23 @@
 import { UserProfile } from "@clerk/nextjs";
+import Breadcrumbs from "components/Layout/Breadcrumbs";
 
-const UserProfilePage = () => {
+const OrganizationProfilePage = () => {
     return (
-        <div className="mt-4 -ml-6">
-            <UserProfile />
+        <div className="mx-auto max-w-7xl px-2">
+            <Breadcrumbs
+                pages={[
+                    {
+                        name: "Login & Security",
+                        href: "/user",
+                        current: true,
+                    },
+                ]}
+            />
+            <div class="erase-cl-styling">
+                <UserProfile />
+            </div>
         </div>
     );
 };
 
-export default UserProfilePage;
+export default OrganizationProfilePage;

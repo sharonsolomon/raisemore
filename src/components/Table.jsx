@@ -108,6 +108,7 @@ const Table = ({ rows, columns, rowCount, onPageChange, page, perPage }) => {
 };
 
 function Pagination({ page, rowCount, onPageChange, perPage }) {
+    console.log({ page, perPage, rowCount });
     return (
         <div
             className=" flex items-center justify-end text-right border-t border-gray-200 bg-white px-4 py-3 sm:px-6"

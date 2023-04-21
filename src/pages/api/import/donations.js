@@ -411,14 +411,7 @@ export async function processDonations({
 }
 
 // Standarized!
-export const cleanPhone = (phone) =>
-    Number(
-        phone
-            ?.trim()
-            .toString()
-            .replaceAll(/[^0-9]/g, "")
-            .substring(0, 10)
-    );
+import { cleanPhone } from "lib/validation";
 
 function newPersonFromDonationObject(donation = {}) {
     // Multiple phone fields
