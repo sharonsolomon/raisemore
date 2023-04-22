@@ -16,6 +16,17 @@ export default function ChatWidgetWrapper() {
           }
         : null;
 
+    const customerObject = customer
+        ? `customer: {
+                name: "${customer?.name}",
+                email: "${customer?.email}",
+                external_id: "${customer?.id}",
+                metadata: {
+                    orgId:"${customer?.metadata?.orgId}",
+                },
+            }`
+        : "";
+
     // Bundle size
     return (
         <>
@@ -36,15 +47,7 @@ export default function ChatWidgetWrapper() {
                       iconVariant: "outlined",
                       baseUrl: "https://app.papercups.io",
                       // Optionally include data about your customer here to identify them
-                      ${
-                          customer
-                              ? `customer: {
-                        name: ${customer?.name},
-                        email: ${customer?.email},
-                        external_id: ${customer?.id},
-                        }`
-                              : ""
-                      }
+                      ${customerObject}
                     },
                   };`}
             </Script>
