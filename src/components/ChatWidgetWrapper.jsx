@@ -13,19 +13,14 @@ export default function ChatWidgetWrapper() {
         if (!user) return;
 
         window.fcWidget.setExternalId(user?.id);
-
-        window.fcWidget.user
-            .update({
-                firstName: user?.firstName,
-                lastName: user?.lastName,
-                email: user?.primaryEmailAddress?.emailAddress,
-                meta: {
-                    orgId: user?.organizationMemberships?.[0]?.organization?.id,
-                    orgName: user?.organizationMemberships?.[0]?.organization?.name,
-                    profileImageUrl: user?.profileImageUrl,
-                },
-            })
-            .then(console.log);
+        window.fcWidget.user.setFirstName(user?.firstName);
+        window.fcWidget.user.setLastName(user?.lastName);
+        window.fcWidget.user.setEmail(user?.primaryEmailAddress?.emailAddress);
+        window.fcWidget.user.setProperties({
+            orgId: user?.organizationMemberships?.[0]?.organization?.id,
+            orgName: user?.organizationMemberships?.[0]?.organization?.name,
+            profileImageUrl: user?.profileImageUrl,
+        });
     };
 
     return (
