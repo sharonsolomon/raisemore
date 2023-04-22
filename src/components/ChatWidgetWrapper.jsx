@@ -1,18 +1,20 @@
-import { useUser, useOrganization, useAuth } from "@clerk/nextjs";
+import { useUser, useAuth } from "@clerk/nextjs";
 import Script from "next/script";
 
 export default function ChatWidgetWrapper() {
     const { isSignedIn, user } = useUser();
     const { orgId } = useAuth();
-    const customer = isSignedIn && {
-        name: user?.fullName,
-        email: user?.primaryEmailAddress?.emailAddress,
-        phone: user?.primaryPhoneNumber?.phoneNumber,
-        external_id: user?.id,
-        metadata: {
-            orgId,
-        },
-    };
+    const customer = isSignedIn
+        ? {
+              name: user?.fullName,
+              email: user?.primaryEmailAddress?.emailAddress,
+              phone: user?.primaryPhoneNumber?.phoneNumber,
+              external_id: user?.id,
+              metadata: {
+                  orgId,
+              },
+          }
+        : null;
 
     // Bundle size
     return (
