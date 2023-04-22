@@ -3,7 +3,7 @@ import useSWR from "swr";
 import { useState, useEffect, Fragment } from "react";
 import "styles/globals.css";
 import Layout from "components/Layout/Layout";
-import { ClerkProvider, useAuth } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkProvider, useAuth } from "@clerk/nextjs";
 import ChatWidgetWrapper from "components/ChatWidgetWrapper";
 import { createSupabaseClient, SupabaseProvider } from "lib/supabaseHooks";
 import { SWRConfig, useSWRConfig } from "swr";
@@ -71,7 +71,10 @@ function SupabaseWrapper({ children }) {
     return (
         <SupabaseProvider value={supabaseClient}>
             <Layout>{children}</Layout>
-            <ChatWidgetWrapper />
+
+            <ClerkLoaded>
+                <ChatWidgetWrapper />
+            </ClerkLoaded>
         </SupabaseProvider>
     );
 }
