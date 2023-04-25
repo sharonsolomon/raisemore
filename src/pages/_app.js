@@ -25,6 +25,8 @@ function App({ Component, pageProps }) {
     return (
         <>
             <Head>
+                <title>Raise More</title>
+
                 {[
                     "https://vitals.vercel-insights.com",
                     "https://clerk.prompt.meerkat-85.lcl.dev",
