@@ -13,7 +13,7 @@ const additional = {
 };
 
 // Buy a phone number from Twilio and add it to the caller_ids table
-export default async function handler(req) {
+export default async function handler(req, res) {
     const { supabase, orgID, error: authError } = await createAuthorizedSupabase(req);
     if (authError) throw error;
 
@@ -39,5 +39,9 @@ export default async function handler(req) {
     );
     if (error) throw JSON.stringify(error);
 
-    return NextResponse.json(twilioResponse);
+    console.log(
+        "Sucessfully purchased phone number " + twilioResponse.phoneNumber + " for org " + orgID
+    );
+
+    res.status(200).json(twilioResponse);
 }

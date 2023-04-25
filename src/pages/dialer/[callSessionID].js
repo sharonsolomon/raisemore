@@ -67,6 +67,10 @@ export default function CallSessionPage() {
             .single()
     );
 
+    const { data: { phone_number: callerID } = {} } = useQuery(
+        supabase.from("caller_ids").select("phone_number").single()
+    );
+
     let {
         data: peopleResponse,
         error,

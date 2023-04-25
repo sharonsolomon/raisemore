@@ -131,7 +131,7 @@ export default function SyncPage() {
                     ]}
                 />
                 <PageTitle
-                    title="Sync Settings"
+                    title="ActBlue Sync"
                     descriptor={
                         <>
                             Configure automatic continuous imports from ActBlue.{" "}
