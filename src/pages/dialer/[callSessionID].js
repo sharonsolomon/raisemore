@@ -29,7 +29,7 @@ export const CallSessionContext = createContext({
     session: null,
 });
 
-const reducer = (prevState, payload) => {
+const conferenceUpdatesReducer = (prevState, payload) => {
     // Bulk update
     if (!payload?.hasOwnProperty("new")) {
         return [...payload];
@@ -56,7 +56,7 @@ export default function CallSessionPage() {
     const { callSessionID } = router.query;
     const supabase = useSupabase();
 
-    const [conferenceUpdates, appendConferenceUpdate] = useReducer(reducer, []);
+    const [conferenceUpdates, appendConferenceUpdate] = useReducer(conferenceUpdatesReducer, []);
     const [forceFetchValue, forceFetchPersonProfile] = useReducer((old) => old + 1, 0);
     const [dialedInFrom, setDialedInFrom] = useState(null);
 
@@ -221,8 +221,10 @@ export default function CallSessionPage() {
                 .from("call_sessions")
                 .update({ current_person_id: newID })
                 .eq("id", callSessionID);
+            // Mutation of call_sessions triggers refetch above
+            mutateSession();
         },
-        [supabase, callSessionID]
+        [supabase, callSessionID, mutateSession]
     );
 
     // Find the current person in the list, and move to the next one.
