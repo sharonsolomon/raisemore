@@ -21,15 +21,15 @@ const Onboarding = (props) => {
     const requirements = {
         hasOrg: <CreateOrgPrompt {...props} />,
         hasOrgType: <SetOrgType {...props} />,
-        hasCallerID: <SetCallerID {...props} />,
+        callerID: <SetCallerID {...props} />,
     };
     return requirements[Object.entries(props).find(([key, value]) => !value)[0]];
 };
 export default Onboarding;
 
 const CreateOrgPrompt = (props) => (
-    <div className="block min-h-full flex-col justify-center sm:px-6 lg:px-8">
-        <div className="sm:mx-auto w-75">
+    <div className="block min-h-full flex-col justify-center">
+        <div className="sm:mx-auto w-75 mt-5">
             <CreateOrganization />
         </div>
     </div>
@@ -154,28 +154,15 @@ const SetOrgType = () => {
     );
 };
 
-const SetCallerID = () => {
-    const { organization } = useOrganization();
-    const captureMutation = async () => {
-        console.log("capture mutation");
-        console.log(
-            await request("/api/organization/updateMetadata", {
-                hasCallerID: true,
-            })
-        );
-        await organization.reload();
-        console.log(organization?.publicMetadata);
-    };
-    return (
-        <div className="block min-h-full flex-col justify-center sm:px-6 lg:px-8">
-            <div className="sm:mx-auto w-75 mt-16">
-                <h1>Set your dialer caller ID</h1>
-                <p>
-                    Pick an area code for your dialer caller ID. This is the number that will show
-                    up when you call donors.
-                </p>
-                <SetCallerIDForm submitButtonText="Set area code" mutate={captureMutation} />
-            </div>
+const SetCallerID = () => (
+    <div className="block min-h-full flex-col justify-center sm:px-6 lg:px-8">
+        <div className="sm:mx-auto w-75 mt-16">
+            <h1>Set your dialer caller ID</h1>
+            <p>
+                Pick an area code for your dialer caller ID. This is the number that will show up
+                when you call donors.
+            </p>
+            <SetCallerIDForm submitButtonText="Set area code" />
         </div>
-    );
-};
+    </div>
+);

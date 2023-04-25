@@ -1,13 +1,13 @@
 import PageTitle from "components/Layout/PageTitle";
 import Breadcrumbs from "components/Layout/Breadcrumbs";
-import { useQuery, useSupabase } from "lib/supabaseHooks";
 import SetCallerIDForm from "components/SetCallerIDForm";
+import { useOrganization } from "@clerk/nextjs";
+import { cleanPhone } from "lib/validation";
+import { prettyPrintPhoneNumber } from "lib/validation";
 
 export default function CallerIDPage() {
-    const supabase = useSupabase();
-    const { mutate, data: { phone_number: callerID } = {} } = useQuery(
-        supabase.from("caller_ids").select("phone_number").single()
-    );
+    const { organization } = useOrganization();
+    const callerID = prettyPrintPhoneNumber(organization?.publicMetadata?.callerID);
 
     return (
         <div className="">
@@ -23,7 +23,7 @@ export default function CallerIDPage() {
                 <p className="mt-3">{callerID ? callerID : "You don't have a number yet!"}</p>
                 <h3>Pick a new area code</h3>{" "}
                 <p className="mt-3">This will replace your current caller ID with a new number.</p>{" "}
-                <SetCallerIDForm mutate={mutate} />
+                <SetCallerIDForm />
             </div>
         </div>
     );

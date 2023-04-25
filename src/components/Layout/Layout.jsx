@@ -58,12 +58,12 @@ const Layout = ({ children }) => {
     navigation.forEach((item) => (item.current = item.href === router.pathname));
 
     // dstructure org id and organization.publicMetadata
-    const { organization: { id: orgID, publicMetadata } = {} } = useOrganization();
+    const { organization } = useOrganization();
 
     const onboardingProps = {
-        hasOrg: !!orgID,
-        hasOrgType: !!publicMetadata?.type,
-        hasCallerID: !!publicMetadata?.hasCallerID,
+        hasOrg: !!organization?.id,
+        hasOrgType: !!organization?.publicMetadata?.type,
+        callerID: !!organization?.publicMetadata?.callerID,
     };
     const onboarded = Object.values(onboardingProps).every((v) => v === true);
 

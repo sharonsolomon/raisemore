@@ -10,3 +10,10 @@ export const cleanPhone = (phone) =>
             .replaceAll(/^0+/g, "") // Remove leading 0
             .substring(0, 10)
     );
+
+export const prettyPrintPhoneNumber = (input) => {
+    const number = cleanPhone(input).toString();
+    return (
+        "(" + number.substring(0, 3) + ") " + number.substring(3, 6) + "-" + number.substring(6, 10)
+    );
+};
