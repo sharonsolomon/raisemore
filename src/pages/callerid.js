@@ -1,19 +1,13 @@
 import PageTitle from "components/Layout/PageTitle";
 import Breadcrumbs from "components/Layout/Breadcrumbs";
-import InsetInput from "components/InsetInput";
-import { useQuery, useSupabase } from "lib/supabaseHooks";
-
-const request = async (url, obj) => {
-    const res = await fetch(url + "?" + new URLSearchParams(obj));
-    return await res.json();
-};
+import SetCallerIDForm from "components/SetCallerIDForm";
+import { useOrganization } from "@clerk/nextjs";
+import { cleanPhone } from "lib/validation";
+import { prettyPrintPhoneNumber } from "lib/validation";
 
 export default function CallerIDPage() {
-    const supabase = useSupabase();
-    // modify this destructuring so that phoneNumber defaults to null
-    const { mutate, data: { phone_number: phoneNumber } = {} } = useQuery(
-        supabase.from("caller_ids").select("phone_number").single()
-    );
+    const { organization } = useOrganization();
+    const callerID = prettyPrintPhoneNumber(organization?.publicMetadata?.callerID);
 
     return (
         <div className="">
@@ -26,31 +20,10 @@ export default function CallerIDPage() {
             </div>
             <div className="mx-auto max-w-7xl px-2">
                 <h3>Your current number:</h3>
-                <p className="mt-3">{phoneNumber ? phoneNumber : "You don't have a number yet!"}</p>
-                <form
-                    onSubmit={async (e) => {
-                        e.preventDefault();
-                        console.log("requesting new number " + e.target.areaCode.value);
-                        await request("/api/buyNumber", { areaCode: e.target.areaCode.value });
-                        mutate();
-                    }}
-                >
-                    <h3>Pick a new area code</h3>
-                    <p className="mt-3">
-                        This will replace your current caller ID with a new number.
-                    </p>
-                    <InsetInput
-                        label="Area Code"
-                        name="areaCode"
-                        type="text"
-                        placeholder="Enter an area code"
-                        required
-                        className="w-52"
-                    />
-                    <button type="submit" className="btn btn-primary">
-                        Replace Caller ID
-                    </button>
-                </form>
+                <p className="mt-3">{callerID ? callerID : "You don't have a number yet!"}</p>
+                <h3>Pick a new area code</h3>{" "}
+                <p className="mt-3">This will replace your current caller ID with a new number.</p>{" "}
+                <SetCallerIDForm />
             </div>
         </div>
     );

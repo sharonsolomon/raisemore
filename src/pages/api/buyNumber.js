@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import twilioInit from "twilio";
 import { createAuthorizedSupabase } from "lib/supabaseHooks";
 import { cleanPhone } from "lib/validation";
+import { clerkClient } from "@clerk/nextjs/server";
+import queryParams from "lib/queryParams";
 
 // config for new callerid numbers
 const additional = {
@@ -13,7 +15,7 @@ const additional = {
 };
 
 // Buy a phone number from Twilio and add it to the caller_ids table
-export default async function handler(req) {
+export default async function handler(req, res) {
     const { supabase, orgID, error: authError } = await createAuthorizedSupabase(req);
     if (authError) throw error;
 
@@ -39,5 +41,14 @@ export default async function handler(req) {
     );
     if (error) throw JSON.stringify(error);
 
-    return NextResponse.json(twilioResponse);
+    console.log(
+        "Sucessfully purchased phone number " + twilioResponse.phoneNumber + " for org " + orgID
+    );
+
+    // Update metadata
+    const response = await clerkClient.organizations.updateOrganizationMetadata(orgID, {
+        publicMetadata: { callerID: twilioResponse.phoneNumber },
+    });
+
+    res.status(200).json(twilioResponse);
 }

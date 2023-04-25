@@ -7,13 +7,17 @@ var capitals = /[A-Z\u00C0-\u00D6\u00D9-\u00DD]/g;
 export const pluralize = (single, plural, number) => (number > 1 ? plural : single);
 export const capitalize = (s) => (s?.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : "");
 
-function snakeCase(str) {
-    //replace capitals with space + lower case equivalent for later parsing
-    str = str.replace(capitals, function (match) {
-        return " " + (match.toLowerCase() || match);
-    });
-    return str.trim().split(wordSeparators).join("_");
-}
+//replace capitals with space + lower case equivalent for later parsing
+
+const snakeCase = (str) =>
+    str
+        .replace(capitals, function (match) {
+            return " " + (match.toLowerCase() || match);
+        })
+        .trim()
+        .split(wordSeparators)
+        .join("_");
+
 export const snakeCaseKeys = (obj) => {
     if (Array.isArray(obj)) {
         return obj.map((v) => snakeCaseKeys(v));

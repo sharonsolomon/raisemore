@@ -6,13 +6,12 @@ import { Dialog, Menu, Transition } from "@headlessui/react";
 import Search from "components/Layout/Search";
 import Brand from "components/Layout/Brand";
 import {
-    useUser,
     UserButton,
     SignUp,
-    CreateOrganization,
     OrganizationSwitcher,
     SignedOut,
     SignedIn,
+    useOrganization,
 } from "@clerk/nextjs";
 import {
     Bars3BottomLeftIcon,
@@ -32,22 +31,21 @@ import {
     UserCircleIcon,
     CurrencyDollarIcon,
     QuestionMarkCircleIcon,
-    PuzzlePieceIcon,
-    FingerPrintIcon,
 } from "@heroicons/react/24/outline";
+import Onboarding from "components/Onboarding";
 const classNames = (...classes) => classes.filter(Boolean).join(" ");
 const navigation = [
     { name: "Dashboard", href: "/", icon: HomeIcon },
     { name: "Create a List", href: "/people", icon: UsersIcon },
     { name: "Saved Lists", href: "/savedlists", icon: FolderIcon },
     { name: "Make Calls", href: "/dialer", icon: PhoneIcon },
-    { name: "Call History", href: "/contacthistory", icon: ClockIcon },
-    { name: "Pledges", href: "/pledges", icon: HandRaisedIcon, header: "Reports" },
+    { name: "Call History", href: "/contacthistory", icon: ClockIcon, header: "Reporting" },
+    { name: "Pledges", href: "/pledges", icon: HandRaisedIcon },
     { name: "Donations", href: "/donations", icon: CurrencyDollarIcon },
-    { name: "Reports", href: "/reports", icon: EnvelopeIcon },
+    { name: "Nightly Reports", href: "/reports", icon: EnvelopeIcon },
     { name: "Import", href: "/import", icon: ArrowUpOnSquareStackIcon, header: "Settings" },
     { name: "Export", href: "/export", icon: CloudArrowDownIcon },
-    { name: "Sync Settings", href: "/sync", icon: ArrowsRightLeftIcon },
+    { name: "ActBlue Sync", href: "/sync", icon: ArrowsRightLeftIcon },
     { name: "My Caller ID", href: "/callerid", icon: QuestionMarkCircleIcon },
     { name: "Manage Organization", href: "/organization", icon: UserPlusIcon },
     { name: "Login & Security", href: "/user", icon: UserCircleIcon },
@@ -55,11 +53,19 @@ const navigation = [
 
 const Layout = ({ children }) => {
     const supabase = useSupabase();
-    const { isSignedIn, isLoading, user } = useUser();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const router = useRouter();
     navigation.forEach((item) => (item.current = item.href === router.pathname));
-    const hasOrg = user?.organizationMemberships?.length;
+
+    // dstructure org id and organization.publicMetadata
+    const { organization } = useOrganization();
+
+    const onboardingProps = {
+        hasOrg: !!organization?.id,
+        hasOrgType: !!organization?.publicMetadata?.type,
+        callerID: !!organization?.publicMetadata?.callerID,
+    };
+    const onboarded = Object.values(onboardingProps).every((v) => v === true);
 
     return (
         <div id="wrapper">
@@ -185,52 +191,44 @@ const Layout = ({ children }) => {
                 <div className="sticky top-0 z-10 flex h-16 flex-shrink-0 bg-white border-b">
                     <button
                         type="button"
-                        className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+                        className="border-r border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 md:hidden"
                         onClick={() => setSidebarOpen(true)}
                     >
                         <span className="sr-only">Open sidebar</span>
                         <Bars3BottomLeftIcon className="h-6 w-6" aria-hidden="true" />
                     </button>
                     <div className="flex flex-1 justify-between pr-4">
-                        {isSignedIn ? (
-                            <>
-                                <div className="flex flex-1">
-                                    <div className="mr-5 relative pt-3 w-full text-gray-400 focus-within:text-gray-600">
-                                        <Search />
-                                    </div>
+                        <SignedIn>
+                            <div className="flex flex-1">
+                                <div className="mr-5 relative pt-3 w-full text-gray-400 focus-within:text-gray-600">
+                                    <Search />
                                 </div>
-                                <div className="ml-4 flex items-center md:ml-6 gap-5">
-                                    <button
-                                        type="button"
-                                        className="rounded-full bg-gray-100 p-1.5 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                    >
-                                        <span className="sr-only">View notifications</span>
-                                        <BellIcon className="h-6 w-6" aria-hidden="true" />
-                                    </button>
-                                    <OrganizationSwitcher
-                                        hidePersonal={true}
-                                        afterSwitchOrganizationUrl="/"
-                                    />
-                                    <UserButton />
-                                </div>
-                            </>
-                        ) : (
-                            ""
-                        )}
+                            </div>
+                            <div className="ml-4 flex items-center md:ml-6 gap-5">
+                                <button
+                                    type="button"
+                                    className="rounded-full bg-gray-100 p-1.5 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                >
+                                    <span className="sr-only">View notifications</span>
+                                    <BellIcon className="h-6 w-6" aria-hidden="true" />
+                                </button>
+                                <OrganizationSwitcher
+                                    hidePersonal={true}
+                                    afterSwitchOrganizationUrl="/"
+                                />
+                                <UserButton />
+                            </div>
+                        </SignedIn>
                     </div>
                 </div>
 
                 <main className="flex-1">
                     <div className="py-6">
                         <SignedIn>
-                            {hasOrg ? (
-                                supabase && children
+                            {!onboarded ? (
+                                <Onboarding {...onboardingProps} />
                             ) : (
-                                <div className="block min-h-full flex-col justify-center sm:px-6 lg:px-8">
-                                    <div className="sm:mx-auto w-75">
-                                        <CreateOrganization />
-                                    </div>
-                                </div>
+                                supabase && children
                             )}
                         </SignedIn>
                         <SignedOut>

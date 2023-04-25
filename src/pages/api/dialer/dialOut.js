@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 export const config = { runtime: "edge" };
 import { Authorization, TWILIO_API_URL } from "lib/twilio";
+import queryParams from "lib/queryParams";
 
 export default async function handler(request) {
-    const { searchParams } = new URL(request.url);
-    const conferenceSID = searchParams.get("conferenceSID");
-    const numberToDial = searchParams.get("numberToDial");
-    const personID = searchParams.get("personID");
+    const { conferenceSID, numberToDial, personID, callerID } = queryParams({ config, request });
 
     const response = await fetch(
         `${TWILIO_API_URL}/Conferences/${conferenceSID}/Participants.json`,
@@ -24,7 +22,7 @@ export default async function handler(request) {
                 // statusCallback: 'https://example.com',
                 // statusCallbackEvent: ['ringing'],
                 // record: true,
-                From: "+16672429611",
+                From: callerID,
                 To: "+1" + numberToDial,
             }).toString(),
         }

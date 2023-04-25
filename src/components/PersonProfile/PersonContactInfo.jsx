@@ -3,20 +3,13 @@ import { useState } from "react";
 import { EMAIL_VALIDATION_REGEX } from "lib/validation";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
+import { prettyPrintPhoneNumber } from "lib/validation";
+
 function phoneNumberDisplayFormatter(input) {
     if (typeof input === "undefined") return null;
     let number = input.toString().replaceAll(/[^0-9]/g, "");
     if (number?.length < 1) return null;
-    if (number?.length === 10) {
-        return (
-            "(" +
-            number.substring(0, 3) +
-            ") " +
-            number.substring(3, 6) +
-            "-" +
-            number.substring(6, 10)
-        );
-    }
+    if (number?.length === 10) return prettyPrintPhoneNumber(number);
     // return with a red badge and mui tooltip
     return (
         <Tooltip title="Invalid phone number" arrow>

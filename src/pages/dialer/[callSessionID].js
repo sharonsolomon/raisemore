@@ -13,6 +13,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 import { parseSQL } from "react-querybuilder";
 import { compilePostgrestQuery } from "lib/compilePostgrestQuery";
+import { useOrganization } from "@clerk/nextjs";
 
 export const CallSessionContext = createContext({
     personID: null,
@@ -67,11 +68,9 @@ export default function CallSessionPage() {
             .single()
     );
 
-    let {
-        data: peopleResponse,
-        error,
-        // mutate,
-    } = useQuery(
+    const callerID = useOrganization().organization.publicMetadata.callerID;
+
+    let { data: peopleResponse, error } = useQuery(
         compilePostgrestQuery({
             currentQuery: parseSQL(session?.saved_lists?.query),
             supabase,
