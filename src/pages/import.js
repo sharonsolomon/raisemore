@@ -162,8 +162,9 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
                     <div className="mx-auto max-w-7xl px-2 ">
                         <h2 className="mt-8 mb-0">Upload a prospect file for donor research:</h2>
                         <p className="font-light">
-                            (required: first_name, last_name, and phone; other fields: zip, email,
-                            bio, tags (comma seperated)){" "}
+                            Required: first_name, last_name, and phone
+                            <br />
+                            other fields: zip, email, bio, tags (comma seperated)
                         </p>
                         <div className="md:grid md:grid-cols-2">
                             <div className="col-span-1">
@@ -183,7 +184,8 @@ const Uploaders = ({ importType, nextStep, setUploadResult }) => {
                     <div className="mx-auto max-w-7xl px-2 ">
                         <h2 className="mt-8 mb-0">Upload pledges</h2>
                         <p className="font-light">
-                            (required: first_name, last_name, zip, amount){" "}
+                            (required: first_name, last_name, and amount; other fields: zip, phone,
+                            email, bio, tags (comma seperated))
                         </p>
                         <div className="md:grid md:grid-cols-2">
                             <div className="col-span-1">
@@ -309,7 +311,7 @@ const importChoices = [
     {
         id: 3,
         title: "Pledges",
-        description: "Use a spreadsheet with first_name, last_name, zip, and amount",
+        description: "Use a spreadsheet with first_name, last_name, and amount",
         users: "2740 users",
     },
 ];

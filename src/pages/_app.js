@@ -1,16 +1,16 @@
+import { Fragment } from "react";
 import Head from "next/head";
 import useSWR from "swr";
-import { useState, useEffect, Fragment } from "react";
 import "styles/globals.css";
-import Layout from "components/Layout/Layout";
 import { ClerkLoaded, ClerkProvider, useAuth } from "@clerk/nextjs";
-import ChatWidgetWrapper from "components/ChatWidgetWrapper";
 import { createSupabaseClient, SupabaseProvider } from "lib/supabaseHooks";
-import { SWRConfig, useSWRConfig } from "swr";
+import { SWRConfig } from "swr";
+import { ToastContainer } from "react-toastify";
+import Layout from "components/Layout/Layout";
+import ChatWidgetWrapper from "components/ChatWidgetWrapper";
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 import { Analytics } from "@vercel/analytics/react";
-import { ToastContainer } from "react-toastify";
 
 function App({ Component, pageProps }) {
     const optionsSWR = {
@@ -25,6 +25,7 @@ function App({ Component, pageProps }) {
     return (
         <>
             <Head>
+                <title>Raise More</title>
                 {[
                     "https://vitals.vercel-insights.com",
                     "https://clerk.prompt.meerkat-85.lcl.dev",
@@ -56,7 +57,7 @@ function App({ Component, pageProps }) {
 function SupabaseWrapper({ children }) {
     const { getToken, userId } = useAuth();
     const { data: supabaseAccessToken, mutate } = useSWR(
-        () => "clerk",
+        "clerk",
         async () =>
             await getToken({
                 template:
@@ -71,35 +72,10 @@ function SupabaseWrapper({ children }) {
     return (
         <SupabaseProvider value={supabaseClient}>
             <Layout>{children}</Layout>
-
             <ClerkLoaded>
                 <ChatWidgetWrapper />
             </ClerkLoaded>
         </SupabaseProvider>
     );
 }
-
-// useEffect(() => {
-//     let now = async () => {
-//         // Get the clerk.dev JWT
-//         const supabaseAccessToken = await getToken({
-//             template:
-//                 process.env.NEXT_PUBLIC_ENVIRONMENT != "development"
-//                     ? "supabase"
-//                     : "supabase-local-development",
-//         });
-//         // Create and set the client
-//         setSupabaseClient(createSupabaseClient(supabaseAccessToken));
-
-//         // Invalidate all previous SWR cached calls
-//         mutate(
-//             (key) => true, // which cache keys are updated
-//             undefined, // update cache data to `undefined`
-//             { revalidate: false } // do not revalidate
-//         );
-//     };
-//     if (userId) now();
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-// }, [userId, sessionId, orgId]);
-
 export default App;
